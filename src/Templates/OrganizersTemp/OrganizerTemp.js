@@ -18,6 +18,7 @@ import {
   TableRow,
   Paper,
 } from '@mui/material';
+// import { VscOpenPreview } from "react-icons/vsc";
 import { useNavigate } from "react-router-dom";
 // import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { CiMenuKebab } from "react-icons/ci";
@@ -25,7 +26,26 @@ const OrganizersTemp = () => {
 
   const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
   const navigate = useNavigate();
+  
 
+  // const handlePreview = () => {
+  //     // Navigate to the desired path
+  //     navigate('/organizerpreview'); // Change '/preview' to your desired route
+  // };
+  const handlePreview = () => {
+    // Gather all the necessary data for the preview
+    const data = {
+    
+      sections, // This contains all your sections and their elements
+    };
+  
+    // You can also use any other required data from your state here
+    console.log("Data for preview:", data);
+  
+    // Navigate to the desired path with data if necessary (you might want to pass it through state)
+    navigate('/organizerpreview', { state: { data } });
+  };
+  
   const [templateName, setTemplateName] = useState('');
   const [organizerName, setOrganizerName] = useState('');
   const [sections, setSections] = useState([]);
@@ -564,6 +584,10 @@ const OrganizersTemp = () => {
       {showOrganizerTemplateForm && (
         <>
           <Box>
+          <Box sx={{display:'flex', alighItems:'center', justifyContent:'space-between', mb:3}}>
+            <Typography variant='h4'>Create Template</Typography>
+            <Button variant="text" onClick={handlePreview} >Preview</Button>
+          </Box>
             <Box>
               <label className='organizer-input-label'>Template Name</label>
               <TextField

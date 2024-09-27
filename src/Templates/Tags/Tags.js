@@ -57,15 +57,15 @@ const Tags = () => {
 
 
 
-  // const handleChange = (event) => {
-  //   const value = event.target.value;
-  //   const selectedOption = options.find(option => option.tagColour === value);
-  //   setSelectedOption(selectedOption);
-  // };
-
-  const handleChange = (event, newValue) => {
-    setSelectedOption(newValue);
+  const handleChange = (event) => {
+    const value = event.target.value;
+    const selectedOption = options.find(option => option.tagColour === value);
+    setSelectedOption(selectedOption);
   };
+
+  // const handleChange = (event, newValue) => {
+  //   setSelectedOption(newValue);
+  // };
 
   const handleUpdateDrawerOpen = () => {
     setIsUpdateDrawerOpen(true);

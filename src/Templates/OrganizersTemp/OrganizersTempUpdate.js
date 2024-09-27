@@ -3,7 +3,7 @@ import {
   Box,
   Button,
   TextField,
-
+  Typography
 } from '@mui/material';
 import { toast } from 'react-toastify';
 import { useNavigate, useParams } from "react-router-dom";
@@ -16,6 +16,19 @@ const OrganizersTempUpdate = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const handlePreview = () => {
+    // Gather all the necessary data for the preview
+    const data = {
+    
+      sections, // This contains all your sections and their elements
+    };
+  
+    // You can also use any other required data from your state here
+    console.log("Data for preview:", data);
+  
+    // Navigate to the desired path with data if necessary (you might want to pass it through state)
+    navigate('/organizerpreview', { state: { data } });
+  };
   const [templateName, setTemplateName] = useState('');
   const [organizerName, setOrganizerName] = useState('');
   const [sections, setSections] = useState([]);
@@ -256,6 +269,10 @@ const OrganizersTempUpdate = () => {
   return (
     <>
       <Box>
+      <Box sx={{display:'flex', alighItems:'center', justifyContent:'space-between', mb:3}}>
+            <Typography variant='h4'>Edit Template</Typography>
+            <Button variant="text" onClick={handlePreview} >Preview</Button>
+          </Box>
         <Box>
           <label className='organizer-input-label'>Template Name</label>
           <TextField

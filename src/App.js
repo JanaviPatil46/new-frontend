@@ -63,6 +63,7 @@ import IRS from "./nested-navbar/documents-nav/IRS";
 import InvoiceTempUpdate from './Templates/InvoicesTemp/InvoiceTempUpdate.js';
 import ChatTempUpdate from './Templates/ChatsTemp/ChatTempUpdate.js';
 import ServicesUpdate from './Pages/ServiceUpdate.js';
+import PreviewOrganizer from './Templates/OrganizersTemp/PreviewOranizer.js'
 const App = () => {
   return (
 
@@ -81,6 +82,7 @@ const App = () => {
           <Route path='workflow/tasks' element={<WorkflowTask/>}/>
           <Route path='workflow/jobs' element={<Jobs/>}/>
           <Route path='workflow/pipelines' element={<Pipeline/>}/>
+          <Route path='/organizerpreview' element={<PreviewOrganizer/>}/>
           <Route path='firmtemp/templates' element={<Templates />}>
             <Route path="tasks" element={<Tasks />} />
             <Route path="tasks" element={<Tasks />} />
