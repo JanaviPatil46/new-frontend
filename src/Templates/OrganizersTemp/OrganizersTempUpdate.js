@@ -19,7 +19,7 @@ const OrganizersTempUpdate = () => {
   const handlePreview = () => {
     // Gather all the necessary data for the preview
     const data = {
-    
+      organizerName,
       sections, // This contains all your sections and their elements
     };
   

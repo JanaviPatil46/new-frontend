@@ -1,116 +1,126 @@
-// import React from 'react';
-// import { useLocation } from 'react-router-dom';
 
-// const OrganizerPreview = () => {
-//   const location = useLocation();
-//   const { data } = location.state || {}; // Destructure data safely
-//   const sections = data?.sections || []; // Get sections or default to an empty array
-
-//   return (
-//     <div>
-//       <h1>Organizer Preview</h1>
-//       {sections.map(section => (
-//         <div key={section.id} style={{ marginBottom: '20px', border: '1px solid #ccc', padding: '10px' }}>
-//           {/* <h2>{section.name}</h2>
-//           <p>{section.text}</p> */}
-//           {section.formElements.map(element => (
-//             <div key={element.id} style={{ marginBottom: '10px' }}>
-//               {element.type === 'Email' && (
-//                 <label>
-//                   {element.text}
-//                   <input 
-//                     type="email" 
-//                     placeholder={element.text} 
-//                     required={element.questionsectionsettings.required} 
-//                     style={{ display: 'block', marginTop: '5px' }}
-//                   />
-//                 </label>
-//               )}
-//               {/* You can handle more types of form elements here */}
-//             </div>
-//           ))}
-//         </div>
-//       ))}
-//     </div>
-//   );
-// };
-
-// export default OrganizerPreview;
-
-
-import { Box, TextField, FormControl, FormControlLabel, Radio, RadioGroup, Typography, Checkbox, Select,  MenuItem } from '@mui/material';
+import {
+    Box,
+    TextField,
+    FormControl,
+    FormControlLabel,
+    Radio,
+    RadioGroup,
+    Typography,
+    Button,
+    LinearProgress,
+    Checkbox,
+    Select,
+    MenuItem,
+    Tooltip,
+} from '@mui/material';
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 const OrganizerPreview = () => {
     const location = useLocation();
-    const { data } = location.state || {}; // Destructure data safely
-    const sections = data?.sections || []; // Get sections or default to an empty array
+    const { data } = location.state || {};
 
-    const findQuestionByText = (questionText) => {
-        for (const section of sections) {
-            for (const formElement of section.formElements) {
-                if (formElement.text === questionText) {
-                    return formElement;
-                }
-            }
+    const organizerName = data?.organizerName || 'Organizer';
+    const sections = data?.sections || [];
+    const [startDate, setStartDate] = useState(null);
+    const [activeStep, setActiveStep] = useState(0);
+    const totalSteps = sections.length;
+    
+
+    const handleStartDateChange = (date) => {
+        setStartDate(date);
+    };
+
+    const handleNext = () => {
+        if (activeStep < totalSteps - 1) {
+            setActiveStep((prevActiveStep) => prevActiveStep + 1);
         }
-        return null;
     };
 
-    const shouldShowQuestion = (element) => {
-        const { required, prefilled, conditional, conditions } = element.questionsectionsettings;
-
-        // If the question is not conditional, show it
-        if (!conditional) {
-            return true;
+    const handleBack = () => {
+        if (activeStep > 0) {
+            setActiveStep((prevActiveStep) => prevActiveStep - 1);
         }
-        // If conditions exist, check if they are met
-        if (conditional && conditions.length > 0) {
-            return conditions.every(condition => {
-                const relatedQuestion = findQuestionByText(condition.element);
-                if (relatedQuestion) {
-                    // Check if the answer to the related question matches the condition
-                    const selectedOption = relatedQuestion.options.find(option => option.selected);
-                    return selectedOption && selectedOption.text === condition.answer;
-                }
-                return false;
-            });
-        }
-        // Default to show the question if none of the above applies
-        return true;
     };
-    const [selectedValue, setSelectedValue] = useState(null);
-
-    const handleRadioChange = (event) => {
-        setSelectedValue(event.target.value); // Set the selected value based on the radio selection
-    };
-    const [selectedCheckboxValues, setSelectedCheckboxValues] = useState([]);
-
-    const handleCheckboxChange = (id) => {
-        setSelectedCheckboxValues((prevSelected) =>
-            prevSelected.includes(id)
-                ? prevSelected.filter((value) => value !== id) // Remove if already selected
-                : [...prevSelected, id] // Add if not selected
-        );
-    };
-
-    const [selectedDropdownValue, setSelectedDropdownValue] = useState(""); // Initialize with an empty string
 
     const handleDropdownChange = (event) => {
-        setSelectedDropdownValue(event.target.value); // Update the selected value based on dropdown choice
+        const selectedIndex = event.target.value;
+        setActiveStep(selectedIndex);
     };
 
- 
+    const [selectedRadioValue, setSelectedRadioValue] = useState("");
+
+    const handleRadioChange = (event) => {
+        setSelectedRadioValue(event.target.value);
+    };
+
+    const [selectedValue, setSelectedValue] = useState(null);
+    const handleChange = (event) => {
+        setSelectedValue(event.target.value);
+    };
+
+    const [selectedDropdownValue, setSelectedDropdownValue] = useState("");
+    const handleDropdownValueChange = (event) => {
+        setSelectedDropdownValue(event.target.value);
+    };
+
+    // Function to strip HTML tags from a string
+    const stripHtmlTags = (html) => {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        return tempDiv.innerText || tempDiv.textContent || "";
+    };
+
+const shouldShowElement = (element) => {
+    if (!element.questionsectionsettings?.conditional) return true;
+
+    const condition = element.questionsectionsettings?.conditions?.[0];
+    console.log("Condition:", condition);
+    console.log("Element:", element);
+
+    if (condition && condition.question && condition.answer) {
+        // Compare the condition's question to some field in the element (try other identifiers if element.text is not working)
+        return condition.answer === selectedRadioValue;
+    }
+    return true; // Show by default if no conditions
+};
+
     return (
-        <Box>
-            <h1>Organizer Preview</h1>
-            {sections.map(section => (
-                <Box key={section.id} style={{ marginBottom: '20px', border: '1px solid #ccc', padding: '10px' }}>
-                    
-                    {section.formElements.map(element => (
-                        <Box key={element.id} style={{ marginBottom: '10px' }}>
-                            {/* {shouldShowQuestion(element) && ( */}
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <Box>
+                <h1>Organizer Preview</h1>
+                <Typography variant='text' gutterBottom>
+                    {organizerName}
+                </Typography>
+
+                {/* Section Dropdown */}
+                <FormControl fullWidth sx={{ marginBottom: '10px', marginTop: '10px' }}>
+                    <Select
+                        value={activeStep}
+                        onChange={handleDropdownChange}
+                        size='small'
+                    >
+                        {sections.map((section, index) => (
+                            <MenuItem key={index} value={index}>
+                                {section.text} ({section.formElements.length} elements)
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+
+                {/* Linear Progress Bar */}
+                <Box mt={2} mb={2}>
+                    <LinearProgress variant="determinate" value={(activeStep + 1) / totalSteps * 100} />
+                </Box>
+
+                {/* Section Form Elements */}
+                {sections[activeStep]?.formElements.map((element) => (
+                    shouldShowElement(element) && (
+                        <Box key={element.text} style={{ marginBottom: '10px' }}>
                             <>
                                 {/* Free Entry, Number, Email */}
                                 {(element.type === "Free Entry" || element.type === "Number" || element.type === "Email") && (
@@ -120,41 +130,39 @@ const OrganizerPreview = () => {
                                             variant="outlined"
                                             size='small'
                                             multiline
-                                            fullwidth
+                                            fullWidth
                                             margin='normal'
                                             placeholder={`${element.type} Answer`}
                                             inputProps={{
                                                 type: element.type === "Free Entry" ? "text" : element.type.toLowerCase(),
                                             }}
                                             maxRows={8}
-
-                                            // required={element.questionsectionsettings?.required}
                                             style={{ display: 'block', marginTop: '5px' }}
                                         />
                                     </Box>
                                 )}
+
                                 {/* Radio Buttons */}
                                 {element.type === "Radio Buttons" && (
                                     <Box>
                                         <Typography>{element.text}</Typography>
                                         <FormControl component="fieldset" className="radio-container">
                                             <RadioGroup
-                                                name={`element-${element.id}`}
-                                                value={selectedValue} // Use the controlled value from state
+                                                name="radioGroup"
+                                                value={selectedRadioValue}
                                                 onChange={handleRadioChange}
                                             >
                                                 {element.options.map((option) => (
                                                     <FormControlLabel
-                                                        key={option.id}
-                                                        value={option.id} // Set the value to option ID
+                                                        key={option.text}
+                                                        value={option.text}
                                                         control={<Radio />}
-                                                        label={option.text} // Set the label to display option text
+                                                        label={option.text}
                                                     />
                                                 ))}
                                             </RadioGroup>
                                         </FormControl>
                                     </Box>
-
                                 )}
 
                                 {/* Checkboxes */}
@@ -164,35 +172,31 @@ const OrganizerPreview = () => {
                                         <FormControl component="fieldset" className="checkbox-container">
                                             {element.options.map((option) => (
                                                 <FormControlLabel
-                                                    key={option.id}
-                                                    control={
-                                                        <Checkbox
-                                                            checked={selectedCheckboxValues.includes(option.id)} // Check if this option is selected
-                                                            onChange={() => handleCheckboxChange(option.id)} // Handle selection change
-                                                        />
-                                                    }
-                                                    label={option.text} // Set the label to display option text
+                                                    key={option.text}
+                                                    control={<Checkbox />}
+                                                    label={option.text}
                                                 />
                                             ))}
                                         </FormControl>
                                     </Box>
                                 )}
-                                {/* Yes/No*/}
+
+                                {/* Yes/No */}
                                 {element.type === "Yes/No" && (
                                     <Box>
                                         <Typography>{element.text}</Typography>
                                         <FormControl component="fieldset" className="radio-container">
                                             <RadioGroup
-                                                name={`element-${element.id}`}
-                                                value={selectedValue} // Use the controlled value from state
-                                                onChange={handleRadioChange}
+                                                name={`element-${element.text}`}
+                                                value={selectedValue}
+                                                onChange={handleChange}
                                             >
                                                 {element.options.map((option) => (
                                                     <FormControlLabel
-                                                        key={option.id}
-                                                        value={option.id} // Set the value to option ID
+                                                        key={option.text}
+                                                        value={option.text}
                                                         control={<Radio />}
-                                                        label={option.text} // Set the label to display option text
+                                                        label={option.text}
                                                     />
                                                 ))}
                                             </RadioGroup>
@@ -200,21 +204,18 @@ const OrganizerPreview = () => {
                                     </Box>
                                 )}
 
+                                {/* Dropdown */}
                                 {element.type === "Dropdown" && (
                                     <Box>
                                         <Typography>{element.text}</Typography>
                                         <FormControl fullWidth className="dropdown-container">
-                                          
                                             <Select
-                                              
-                                                value={selectedDropdownValue} // Controlled value from state
-                                                onChange={handleDropdownChange} // Handle dropdown change
-                                              size='small'
-                                             
-                                              
+                                                value={selectedDropdownValue}
+                                                onChange={handleDropdownValueChange}
+                                                size='small'
                                             >
                                                 {element.options.map((option) => (
-                                                    <MenuItem key={option.id} value={option.id}>
+                                                    <MenuItem key={option.text} value={option.text}>
                                                         {option.text}
                                                     </MenuItem>
                                                 ))}
@@ -222,16 +223,80 @@ const OrganizerPreview = () => {
                                         </FormControl>
                                     </Box>
                                 )}
- {/* Date*/}
 
+                                {/* Date */}
+                                {element.type === "Date" && (
+                                    <Box>
+                                        <Typography>{element.text}</Typography>
+                                        <DatePicker
+                                            format="DD/MM/YYYY"
+                                            sx={{ width: '100%', backgroundColor: '#fff' }}
+                                            selected={startDate}
+                                            onChange={handleStartDateChange}
+                                            renderInput={(params) => <TextField {...params} size="small" />}
+                                        />
+                                    </Box>
+                                )}
 
+                                {/* File Upload */}
+                                {element.type === "File Upload" && (
+                                    <Box>
+                                        <Typography>{element.text}</Typography>
+                                        <Tooltip title="Unavailable in preview mode" placement="top">
+                                            <Box sx={{ position: 'relative', width: '100%' }}>
+                                                <TextField
+                                                    variant="outlined"
+                                                    size="small"
+                                                    fullWidth
+                                                    margin="normal"
+                                                    disabled
+                                                    placeholder="Add Document"
+                                                    sx={{
+                                                        cursor: 'not-allowed',
+                                                        '& .MuiInputBase-input': {
+                                                            pointerEvents: 'none',
+                                                            cursor: 'not-allowed',
+                                                        },
+                                                    }}
+                                                />
+                                            </Box>
+                                        </Tooltip>
+                                    </Box>
+                                )}
+
+                                {/* Text Editor */}
+                                {element.type === "Text Editor" && (
+                                    <Box>
+                                        <Typography>{stripHtmlTags(element.text)}</Typography>
+                                    </Box>
+                                )}
                             </>
-                            {/* )} */}
                         </Box>
-                    ))}
+                    )
+                ))}
+
+                {/* Navigation Buttons */}
+                <Box>
+                    <Button
+                        variant="outlined"
+                        onClick={handleBack}
+                        disabled={activeStep === 0}
+                    >
+                        Back
+                    </Button>
+
+                    {activeStep < totalSteps - 1 && (
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleNext}
+                        >
+                            Next
+                        </Button>
+                    )}
                 </Box>
-            ))}
-        </Box>
+            </Box>
+        </LocalizationProvider>
     );
 };
 
