@@ -1,20 +1,15 @@
-
+import React, { useState } from 'react';
 import {
     Box,
     TextField,
     FormControl,
-    FormControlLabel,
-    Radio,
-    RadioGroup,
     Typography,
     Button,
     LinearProgress,
-    Checkbox,
     Select,
     MenuItem,
     Tooltip,
 } from '@mui/material';
-import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -23,13 +18,11 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 const OrganizerPreview = () => {
     const location = useLocation();
     const { data } = location.state || {};
-
     const organizerName = data?.organizerName || 'Organizer';
     const sections = data?.sections || [];
     const [startDate, setStartDate] = useState(null);
     const [activeStep, setActiveStep] = useState(0);
     const totalSteps = sections.length;
-    
 
     const handleStartDateChange = (date) => {
         setStartDate(date);
@@ -52,42 +45,85 @@ const OrganizerPreview = () => {
         setActiveStep(selectedIndex);
     };
 
-    const [selectedRadioValue, setSelectedRadioValue] = useState("");
+    const [radioValues, setRadioValues] = useState({}); // Store the selected values for each radio group
+    const [checkboxValues, setCheckboxValues] = useState({}); // Store the selected values for checkboxes
+    const [answeredElements, setAnsweredElements] = useState({}); // Track which elements have been answered
 
-    const handleRadioChange = (event) => {
-        setSelectedRadioValue(event.target.value);
+    const handleRadioChange = (value, elementText) => {
+        setRadioValues((prevValues) => ({
+            ...prevValues,
+            [elementText]: value, // Update the selected value for the specific radio group
+        }));
+        setAnsweredElements((prevAnswered) => ({
+            ...prevAnswered,
+            [elementText]: true, // Mark the element as answered
+        }));
+    };
+
+    const handleCheckboxChange = (value, elementText) => {
+        setCheckboxValues((prevValues) => ({
+            ...prevValues,
+            [elementText]: {
+                ...prevValues[elementText],
+                [value]: !prevValues[elementText]?.[value], // Toggle the checkbox value
+            },
+        }));
+        setAnsweredElements((prevAnswered) => ({
+            ...prevAnswered,
+            [elementText]: true, // Mark the element as answered
+        }));
     };
 
     const [selectedValue, setSelectedValue] = useState(null);
-    const handleChange = (event) => {
+    const handleChange = (event, elementText) => {
         setSelectedValue(event.target.value);
+        setAnsweredElements((prevAnswered) => ({
+            ...prevAnswered,
+            [elementText]: true, // Mark the element as answered
+        }));
     };
-
+    const [inputValues, setInputValues] = useState({});
+    const handleInputChange = (event, elementText) => {
+        const { value } = event.target;
+        setInputValues((prevValues) => ({
+            ...prevValues,
+            [elementText]: value, // Store the input value for the specific TextField
+        }));
+        setAnsweredElements((prevAnswered) => ({
+            ...prevAnswered,
+            [elementText]: true, // Mark the element as answered
+        }));
+    };
     const [selectedDropdownValue, setSelectedDropdownValue] = useState("");
-    const handleDropdownValueChange = (event) => {
+    const handleDropdownValueChange = (event, elementText) => {
         setSelectedDropdownValue(event.target.value);
+        setAnsweredElements((prevAnswered) => ({
+            ...prevAnswered,
+            [elementText]: true, // Mark the element as answered
+        }));
     };
 
-    // Function to strip HTML tags from a string
     const stripHtmlTags = (html) => {
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = html;
         return tempDiv.innerText || tempDiv.textContent || "";
     };
 
-const shouldShowElement = (element) => {
-    if (!element.questionsectionsettings?.conditional) return true;
+    const shouldShowElement = (element) => {
+        if (!element.questionsectionsettings?.conditional) return true;
 
-    const condition = element.questionsectionsettings?.conditions?.[0];
-    console.log("Condition:", condition);
-    console.log("Element:", element);
+        const condition = element.questionsectionsettings?.conditions?.[0];
+        if (condition && condition.question && condition.answer) {
+            return condition.answer === radioValues[condition.question];
+        }
+        return true; // Show by default if no conditions
+    };
 
-    if (condition && condition.question && condition.answer) {
-        // Compare the condition's question to some field in the element (try other identifiers if element.text is not working)
-        return condition.answer === selectedRadioValue;
-    }
-    return true; // Show by default if no conditions
-};
+    // Calculate the number of answered elements for the active step
+    const totalElements = sections[activeStep]?.formElements.length || 0;
+    const answeredCount = sections[activeStep]?.formElements.filter(
+        (element) => answeredElements[element.text]
+    ).length || 0;
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -97,7 +133,6 @@ const shouldShowElement = (element) => {
                     {organizerName}
                 </Typography>
 
-                {/* Section Dropdown */}
                 <FormControl fullWidth sx={{ marginBottom: '10px', marginTop: '10px' }}>
                     <Select
                         value={activeStep}
@@ -106,194 +141,171 @@ const shouldShowElement = (element) => {
                     >
                         {sections.map((section, index) => (
                             <MenuItem key={index} value={index}>
-                                {section.text} ({section.formElements.length} elements)
+                                {section.text} ({answeredCount}/{totalElements})
                             </MenuItem>
                         ))}
                     </Select>
                 </FormControl>
 
-                {/* Linear Progress Bar */}
                 <Box mt={2} mb={2}>
                     <LinearProgress variant="determinate" value={(activeStep + 1) / totalSteps * 100} />
                 </Box>
 
-                {/* Section Form Elements */}
                 {sections[activeStep]?.formElements.map((element) => (
                     shouldShowElement(element) && (
                         <Box key={element.text} style={{ marginBottom: '10px' }}>
-                            <>
-                                {/* Free Entry, Number, Email */}
-                                {(element.type === "Free Entry" || element.type === "Number" || element.type === "Email") && (
-                                    <Box>
-                                        {element.text}
-                                        <TextField
-                                            variant="outlined"
+                            {/* Free Entry, Number, Email */}
+                            {(element.type === "Free Entry" || element.type === "Number" || element.type === "Email") && (
+                                <Box>
+                                   <Typography fontSize='18px' mb={2}>{element.text}</Typography> 
+                                    <TextField
+                                        variant="outlined"
+                                        size='small'
+                                        multiline
+                                        fullWidth
+                                        margin='normal'
+                                        placeholder={`${element.type} Answer`}
+                                        inputProps={{
+                                            type: element.type === "Free Entry" ? "text" : element.type.toLowerCase(),
+                                        }}
+                                        maxRows={8}
+                                        style={{ display: 'block', marginTop: '15px' }}
+                                        // onChange={() =>
+                                        //     setAnsweredElements((prevAnswered) => ({
+                                        //         ...prevAnswered,
+                                        //         [element.text]: true, // Mark as answered when typing
+                                        //     }))
+                                        // }
+                                        value={inputValues[element.text] || ''} // Set value from state
+                                        onChange={(e) => handleInputChange(e, element.text)} // Handle change
+                                   
+                                    />
+                                </Box>
+                            )}
+
+                            {/* Radio Buttons as Buttons */}
+                            {element.type === "Radio Buttons" && (
+                                <Box>
+                                    <Typography fontSize='18px'  mb={2}>{element.text}</Typography> 
+                                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                        {element.options.map((option) => (
+                                            <Button
+                                                key={option.text}
+                                                variant={radioValues[element.text] === option.text ? 'contained' : 'outlined'}
+                                                onClick={() => handleRadioChange(option.text, element.text)}
+                                            >
+                                                {option.text}
+                                            </Button>
+                                        ))}
+                                    </Box>
+                                </Box>
+                            )}
+
+                            {/* Checkboxes as Buttons */}
+                            {element.type === "Checkboxes" && (
+                                <Box>
+                                   <Typography fontSize='18px' mb={2}>{element.text}</Typography> 
+                                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                        {element.options.map((option) => (
+                                            <Button
+                                                key={option.text}
+                                                variant={checkboxValues[element.text]?.[option.text] ? 'contained' : 'outlined'}
+                                                onClick={() => handleCheckboxChange(option.text, element.text)}
+                                            >
+                                                {option.text}
+                                            </Button>
+                                        ))}
+                                    </Box>
+                                </Box>
+                            )}
+
+                            {/* Yes/No */}
+                            {element.type === "Yes/No" && (
+                                <Box>
+                                     <Typography fontSize='18px' mb={2}>{element.text}</Typography> 
+                                    <Box sx={{ display: 'flex', gap: 1 }}>
+                                        {element.options.map((option) => (
+                                            <Button
+                                                key={option.text}
+                                                variant={selectedValue === option.text ? 'contained' : 'outlined'}
+                                                onClick={(event) => handleChange(event, element.text)}
+                                            >
+                                                {option.text}
+                                            </Button>
+                                        ))}
+                                    </Box>
+                                </Box>
+                            )}
+
+                            {/* Dropdown */}
+                            {element.type === "Dropdown" && (
+                                <Box>
+                                    <Typography fontSize='18px' mb={2}>{element.text}</Typography> 
+                                    <FormControl fullWidth>
+                                        <Select
+                                            value={selectedDropdownValue}
+                                            onChange={(event) => handleDropdownValueChange(event, element.text)}
                                             size='small'
-                                            multiline
-                                            fullWidth
-                                            margin='normal'
-                                            placeholder={`${element.type} Answer`}
-                                            inputProps={{
-                                                type: element.type === "Free Entry" ? "text" : element.type.toLowerCase(),
-                                            }}
-                                            maxRows={8}
-                                            style={{ display: 'block', marginTop: '5px' }}
-                                        />
-                                    </Box>
-                                )}
-
-                                {/* Radio Buttons */}
-                                {element.type === "Radio Buttons" && (
-                                    <Box>
-                                        <Typography>{element.text}</Typography>
-                                        <FormControl component="fieldset" className="radio-container">
-                                            <RadioGroup
-                                                name="radioGroup"
-                                                value={selectedRadioValue}
-                                                onChange={handleRadioChange}
-                                            >
-                                                {element.options.map((option) => (
-                                                    <FormControlLabel
-                                                        key={option.text}
-                                                        value={option.text}
-                                                        control={<Radio />}
-                                                        label={option.text}
-                                                    />
-                                                ))}
-                                            </RadioGroup>
-                                        </FormControl>
-                                    </Box>
-                                )}
-
-                                {/* Checkboxes */}
-                                {element.type === "Checkboxes" && (
-                                    <Box>
-                                        <Typography>{element.text}</Typography>
-                                        <FormControl component="fieldset" className="checkbox-container">
+                                        >
                                             {element.options.map((option) => (
-                                                <FormControlLabel
-                                                    key={option.text}
-                                                    control={<Checkbox />}
-                                                    label={option.text}
-                                                />
+                                                <MenuItem key={option.text} value={option.text}>
+                                                    {option.text}
+                                                </MenuItem>
                                             ))}
-                                        </FormControl>
-                                    </Box>
-                                )}
+                                        </Select>
+                                    </FormControl>
+                                </Box>
+                            )}
 
-                                {/* Yes/No */}
-                                {element.type === "Yes/No" && (
-                                    <Box>
-                                        <Typography>{element.text}</Typography>
-                                        <FormControl component="fieldset" className="radio-container">
-                                            <RadioGroup
-                                                name={`element-${element.text}`}
-                                                value={selectedValue}
-                                                onChange={handleChange}
-                                            >
-                                                {element.options.map((option) => (
-                                                    <FormControlLabel
-                                                        key={option.text}
-                                                        value={option.text}
-                                                        control={<Radio />}
-                                                        label={option.text}
-                                                    />
-                                                ))}
-                                            </RadioGroup>
-                                        </FormControl>
-                                    </Box>
-                                )}
+                            {/* Date */}
+                            {element.type === "Date" && (
+                                <Box>
+                                    <Typography fontSize='18px' mb={2}>{element.text}</Typography> 
+                                    <DatePicker
+                                        format="DD/MM/YYYY"
+                                        sx={{ width: '100%', backgroundColor: '#fff' }}
+                                        selected={startDate}
+                                        onChange={handleStartDateChange}
+                                        renderInput={(params) => <TextField {...params} size="small" />}
+                                        onOpen={() =>
+                                            setAnsweredElements((prevAnswered) => ({
+                                                ...prevAnswered,
+                                                [element.text]: true, // Mark as answered when opened
+                                            }))
+                                        }
+                                    />
+                                </Box>
+                            )}
 
-                                {/* Dropdown */}
-                                {element.type === "Dropdown" && (
+                            {/* File Upload */}
+                            {element.type === "File Upload" && (
+                                <Box>
+                                     <Typography fontSize='18px' mb={2}>{element.text}</Typography> 
+                                    <Tooltip title="Unavailable in preview mode" placement="top">
+                                        <Box sx={{ position: 'relative', display: 'inline-block' }}>
+                                            <Button variant="contained" color="primary" disabled>
+                                                Upload
+                                            </Button>
+                                        </Box>
+                                    </Tooltip>
+                                </Box>
+                            )}
+                            {element.type === "Text Editor" && (
                                     <Box>
-                                        <Typography>{element.text}</Typography>
-                                        <FormControl fullWidth className="dropdown-container">
-                                            <Select
-                                                value={selectedDropdownValue}
-                                                onChange={handleDropdownValueChange}
-                                                size='small'
-                                            >
-                                                {element.options.map((option) => (
-                                                    <MenuItem key={option.text} value={option.text}>
-                                                        {option.text}
-                                                    </MenuItem>
-                                                ))}
-                                            </Select>
-                                        </FormControl>
-                                    </Box>
+                                         <Typography>{stripHtmlTags(element.text)}</Typography>
+                                     </Box>
                                 )}
-
-                                {/* Date */}
-                                {element.type === "Date" && (
-                                    <Box>
-                                        <Typography>{element.text}</Typography>
-                                        <DatePicker
-                                            format="DD/MM/YYYY"
-                                            sx={{ width: '100%', backgroundColor: '#fff' }}
-                                            selected={startDate}
-                                            onChange={handleStartDateChange}
-                                            renderInput={(params) => <TextField {...params} size="small" />}
-                                        />
-                                    </Box>
-                                )}
-
-                                {/* File Upload */}
-                                {element.type === "File Upload" && (
-                                    <Box>
-                                        <Typography>{element.text}</Typography>
-                                        <Tooltip title="Unavailable in preview mode" placement="top">
-                                            <Box sx={{ position: 'relative', width: '100%' }}>
-                                                <TextField
-                                                    variant="outlined"
-                                                    size="small"
-                                                    fullWidth
-                                                    margin="normal"
-                                                    disabled
-                                                    placeholder="Add Document"
-                                                    sx={{
-                                                        cursor: 'not-allowed',
-                                                        '& .MuiInputBase-input': {
-                                                            pointerEvents: 'none',
-                                                            cursor: 'not-allowed',
-                                                        },
-                                                    }}
-                                                />
-                                            </Box>
-                                        </Tooltip>
-                                    </Box>
-                                )}
-
-                                {/* Text Editor */}
-                                {element.type === "Text Editor" && (
-                                    <Box>
-                                        <Typography>{stripHtmlTags(element.text)}</Typography>
-                                    </Box>
-                                )}
-                            </>
                         </Box>
                     )
                 ))}
 
-                {/* Navigation Buttons */}
-                <Box>
-                    <Button
-                        variant="outlined"
-                        onClick={handleBack}
-                        disabled={activeStep === 0}
-                    >
+                <Box display='flex' alignItems='center' gap={3} mt={2}>
+                    <Button onClick={handleBack} disabled={activeStep === 0}  variant="outlined">
                         Back
                     </Button>
-
-                    {activeStep < totalSteps - 1 && (
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={handleNext}
-                        >
-                            Next
-                        </Button>
-                    )}
+                    <Button onClick={handleNext} disabled={activeStep === totalSteps - 1}  variant="contained">
+                        Next
+                    </Button>
                 </Box>
             </Box>
         </LocalizationProvider>
