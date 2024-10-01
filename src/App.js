@@ -64,6 +64,7 @@ import InvoiceTempUpdate from './Templates/InvoicesTemp/InvoiceTempUpdate.js';
 import ChatTempUpdate from './Templates/ChatsTemp/ChatTempUpdate.js';
 import ServicesUpdate from './Pages/ServiceUpdate.js';
 import PreviewOrganizer from './Templates/OrganizersTemp/PreviewOranizer.js'
+
 const App = () => {
   return (
 
@@ -143,6 +144,7 @@ const App = () => {
             </Route>
           </Route>
           <Route path='*' element={<ErrorPage />} />
+          
         </Route>
       
         

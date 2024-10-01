@@ -41,8 +41,8 @@ const Templates = () => {
                     
 
                     <NavLink to='/firmtemp/templates/invoices' >Invoices</NavLink>
-                    <NavLink to='/firmtemp/templates/recurring-invoices'  >Recurring invoices</NavLink>
-                    <NavLink to='/firmtemp/templates/signatures'  >Signatures</NavLink>
+                    {/* <NavLink to='/firmtemp/templates/recurring-invoices'  >Recurring invoices</NavLink>
+                    <NavLink to='/firmtemp/templates/signatures'  >Signatures</NavLink> */}
                     <NavLink to='/firmtemp/templates/proposals'>Proposals & Els</NavLink>
                     <NavLink to='/firmtemp/templates/organizers' >Organizers</NavLink>
                 </Box>

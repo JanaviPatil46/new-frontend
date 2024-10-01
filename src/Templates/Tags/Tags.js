@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import './tag.css'
-import { Box, Button, Typography, Drawer, Select, MenuItem, IconButton, TextField } from '@mui/material';
+import { Box, Button, Typography, Drawer, Select, MenuItem, IconButton, TextField,Alert } from '@mui/material';
 import { FiSettings } from "react-icons/fi";
 import { CiMenuKebab } from "react-icons/ci";
 import { useTheme } from '@mui/material/styles';
@@ -120,8 +120,17 @@ const Tags = () => {
     }
   };
 
-
-
+  const [tagNameError, setTagNameError] = useState('');
+  const validateForm = () => {
+    let isValid = true;
+    if (!inputValue) {
+      setTagNameError("Tag Name can't be blank");
+      // toast.error("Name can't be blank");
+      isValid = false;
+    } else {
+      setTagNameError('');
+    }
+  }
   console.log(tagidget);
   const handleDelete = (_id) => {
     // Show a confirmation prompt
@@ -168,6 +177,9 @@ const Tags = () => {
   };
 
   const handleSubmit = () => {
+    if (!validateForm()) {
+      return; // Prevent form submission if validation fails
+    }
     if (selectedOption) {
       const { tagName, tagColour } = selectedOption;
       sendApiData(tagName, tagColour);
@@ -208,6 +220,8 @@ const Tags = () => {
   };
 
   const handleUpdatesumbit = () => {
+    
+
     if (selectedOption) {
       const { tagColour } = selectedOption;
       UpdatedTag(inputValue, tagColour);
@@ -366,10 +380,29 @@ const Tags = () => {
                   value={inputValue}
                   onChange={(e) => handleInputChange(e.target.value)}
                   fullWidth
-                  margin="normal"
+                  // margin="normal"
                   size="small"
-                  sx={{ backgroundColor: '#fff' }}
+                  sx={{ backgroundColor: '#fff', mt:1 }}
+
+                error={!!tagNameError}
                 />
+                {(!!tagNameError) && <Alert sx={{
+                  width: '96%',
+                  p: '0', // Adjust padding to control the size
+                  pl: '4%', height: '23px',
+                  borderRadius: '10px',
+                  borderTopLeftRadius: '0',
+                  borderTopRightRadius: '0',
+                  fontSize: '15px',
+                  display: 'flex',
+                  alignItems: 'center', // Center content vertically
+                  '& .MuiAlert-icon': {
+                    fontSize: '16px', // Adjust the size of the icon
+                    mr: '8px', // Add margin to the right of the icon
+                  },
+                }} variant="filled" severity="error" >
+                  Tag Name can't be blank
+                </Alert>}
 
               </Box>
               <Box sx={{ mt: 3 }}>
@@ -454,6 +487,7 @@ const Tags = () => {
                   margin="normal"
                   size="small"
                   sx={{ width: '100%' }}
+               
                 />
               </Box>
               <Box sx={{ mt: 3 }}>

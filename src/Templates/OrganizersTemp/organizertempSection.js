@@ -746,7 +746,12 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
     return sections
       .flatMap(section =>
         section.formElements
-          .filter(element => element.type === 'Radio Buttons')
+          // .filter(element => element.type === 'Radio Buttons')
+          .filter(element => 
+            element.type === 'Radio Buttons' || 
+            element.type === 'Checkboxes' || 
+            element.type === 'Dropdown'
+          )
           .map(element => element.text)
         //  .map(element => ({ text: element.text, sectionName: section.text })) 
       );
