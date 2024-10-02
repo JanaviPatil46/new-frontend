@@ -412,7 +412,7 @@ const Example = () => {
           }
           return (
             <span style={{
-              backgroundColor: tags[0].tagColour,
+              backgroundColor: tags.tagColour,
               color: "#fff",
               borderRadius: "60px",
               padding: "0.1rem 0.8rem",
@@ -420,7 +420,7 @@ const Example = () => {
               display: 'inline-block',
               margin: '2px'
             }}>
-              {tags[0].tagName}
+              {tags.tagName}
             </span>
           );
         },

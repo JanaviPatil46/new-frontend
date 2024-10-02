@@ -1,6 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { PiDotsSixVerticalBold } from "react-icons/pi";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { FiPlusCircle } from "react-icons/fi";
 import {
     Box,
     Button,
@@ -17,7 +20,8 @@ import {
     ListItem,
     ListItemText,
     Popover,
-
+    Checkbox,
+    IconButton
 } from '@mui/material';
 
 import Editor from '../Texteditor/Editor';
@@ -236,6 +240,8 @@ const ChatTempUpdate = () => {
             setDaysuntilNextReminder(chatTemplate.daysuntilnextreminder);
             setNoOfReminder(chatTemplate.numberofreminders);
 
+            setSubtaskSwitch(chatTemplate.isclienttaskchecked)
+            setSubtasks(chatTemplate.clienttasks)
             setInitialData({
                 templateName: chatTemplate.templatename,
                 selectedUser: {
@@ -246,7 +252,9 @@ const ChatTempUpdate = () => {
                 description: chatTemplate.description,
                 absoluteDate: chatTemplate.sendreminderstoclient,
                 daysuntilNextReminder: chatTemplate.daysuntilnextreminder,
-                noOfReminder: chatTemplate.numberofreminders
+                noOfReminder: chatTemplate.numberofreminders,
+                SubtaskSwitch: chatTemplate.isclienttaskchecked,
+                subtasks:chatTemplate.clienttasks
             });
         } catch (error) {
             console.error("Error fetching chat template:", error);
@@ -257,12 +265,83 @@ const ChatTempUpdate = () => {
         fetchChatTemplate();
     }, [id]);
 
+    const [subtasks, setSubtasks] = useState([]);
+    const [checkedSubtasks, setCheckedSubtasks] = useState([]);
 
+    const handleCheckboxChange = (subtaskId) => {
+        // Update only the checked state of the specific subtask being changed
+        setSubtasks(prevSubtasks => 
+            prevSubtasks.map(subtask => 
+                subtask.id === subtaskId 
+                    ? { ...subtask, checked: !subtask.checked } // Toggle checked state for the clicked subtask
+                    : subtask // Keep other subtasks the same
+            )
+        );
+    
+        // Update checkedSubtasks to only reflect the clicked subtask's change
+        setCheckedSubtasks(prevCheckedSubtasks => {
+            // const isChecked = prevCheckedSubtasks.includes(subtaskId);
+    
+            // If the subtask is already checked, we want to remove it from the list
+            // if (isChecked) {
+            //     return prevCheckedSubtasks.filter(id => id !== subtaskId); // Remove if already checked
+            // }
+    
+            // If it is not checked, we add it to the checked list
+            return [...prevCheckedSubtasks, subtaskId]; // Add if not checked
+        });
+    };
+    
+  
+   
+    
+    // Optional: Use useEffect to log after state updates
+    useEffect(() => {
+        console.log("Updated checkedSubtasks:", checkedSubtasks);
+        console.log("Updated subtasks:", subtasks);
+    }, [checkedSubtasks, subtasks]);
+
+    const handleAddSubtask = () => {
+        const newId = String(subtasks.length + 1);
+        setSubtasks([...subtasks, { id: newId, text: "" }]);
+    };
+
+    const handleDragEnd = (result) => {
+        // Ensure a valid drop location
+        if (!result.destination) return;
+
+        // Reorder subtasks based on the drag-and-drop result
+        const newSubtasks = Array.from(subtasks);
+        const [reorderedItem] = newSubtasks.splice(result.source.index, 1);
+        newSubtasks.splice(result.destination.index, 0, reorderedItem);
+
+        // Update the state with the new order of subtasks
+        setSubtasks(newSubtasks);
+    };
+
+
+    const handleInputChange = (id, value) => {
+        setSubtasks(subtasks.map((subtask) => (subtask.id === id ? { ...subtask, text: value } : subtask)));
+    };
+
+    const handleDeleteSubtask = (id) => {
+        setSubtasks(subtasks.filter((subtask) => subtask.id !== id));
+    };
+
+    const [SubtaskSwitch, setSubtaskSwitch] = useState(false);
+    const handleSubtaskSwitch = (checked) => {
+        setSubtaskSwitch(checked);
+    };
 
     const savechat = async () => {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
     
+        const subtaskData = subtasks.map(({ id, text, checked }) => ({
+            id,
+            text,
+            checked: checked !== undefined ? checked : false // Ensure checked is either true or false
+        }));
         const raw = JSON.stringify({
             templatename:  templateName,
             from: selecteduser.value,
@@ -271,7 +350,8 @@ const ChatTempUpdate = () => {
             sendreminderstoclient: absoluteDate,
             daysuntilnextreminder: daysuntilNextReminder,
             numberofreminders: noOfReminder,
-            clienttasks: ["ghghghghj"],
+            clienttasks: subtaskData,
+            isclienttaskchecked:SubtaskSwitch,
             active: "true"
         });
     
@@ -307,6 +387,11 @@ const ChatTempUpdate = () => {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
     
+        const subtaskData = subtasks.map(({ id, text, checked }) => ({
+            id,
+            text,
+            checked: checked !== undefined ? checked : false // Ensure checked is either true or false
+        }));
         const raw = JSON.stringify({
             templatename:  templateName,
             from: selecteduser.value,
@@ -315,7 +400,8 @@ const ChatTempUpdate = () => {
             sendreminderstoclient: absoluteDate,
             daysuntilnextreminder: daysuntilNextReminder,
             numberofreminders: noOfReminder,
-            clienttasks: ["ghghghghj"],
+            clienttasks: subtaskData,
+            isclienttaskchecked:SubtaskSwitch,
             active: "true"
         });
     
@@ -552,18 +638,80 @@ const ChatTempUpdate = () => {
                                         </Box>
                                     </Box>
                                 </Grid>
-                                <Grid item xs={12} sm={1} sx={{ display: { xs: 'none', sm: 'block' } }}>
+                                <Grid item xs={12} sm={0.4} sx={{ display: { xs: 'none', sm: 'block' } }}>
                                     <Box
                                         sx={{
                                             borderLeft: '1px solid black',
                                             height: '100%',
-                                            margin: '0 20px'
+                                            ml: 2.5
                                         }}
                                     ></Box>
                                 </Grid>
-                                <Grid item xs={12} sm={5} ml={{ xs: 0, sm: 3 }}>
+                                <Grid item xs={12} sm={5.8}  ml={{ xs: 0, sm: 2 }}>
+                                        <div className="B">
 
-                                </Grid>
+                                            <DragDropContext onDragEnd={handleDragEnd}>
+
+                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                    <Typography variant='h6'>Client tasks</Typography>
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch onChange={(event) => handleSubtaskSwitch(event.target.checked)} checked={SubtaskSwitch} color="primary" />
+                                                        }
+
+                                                    />
+                                                </Box>
+
+                                                {SubtaskSwitch && (
+                                                    <Droppable droppableId="subtaskList">
+                                                        {(provided) => (
+                                                            <div className="subtask-input" {...provided.droppableProps} ref={provided.innerRef}>
+
+                                                                {(subtasks.length > 0 ? subtasks : [{ id: 'default', text: '' }]).map((subtask, index) => (
+                                                                    <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
+                                                                        {(provided) => (
+                                                                            <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+
+                                                                                <Box display="flex" gap="30px" alignItems="center">
+                                                                                    <Checkbox
+                                                                                        style={{ cursor: 'pointer' }}
+                                                                                        // checked={checkedSubtasks.includes(subtask.id)}
+                                                                                        checked={subtask.checked}
+                                                                                        onChange={() => handleCheckboxChange(subtask.id)}
+                                                                                    />
+                                                                                    <TextField
+                                                                                        placeholder="Things To do"
+                                                                                        value={subtask.text}
+                                                                                        size='small'
+                                                                                        margin='normal'
+                                                                                        fullWidth
+                                                                                        onChange={(e) => handleInputChange(subtask.id, e.target.value)}
+                                                                                        variant="outlined"
+                                                                                    />
+                                                                                    <IconButton onClick={() => handleDeleteSubtask(subtask.id)} style={{ cursor: 'pointer' }}>
+                                                                                        <RiDeleteBin6Line />
+                                                                                    </IconButton>
+                                                                                    <IconButton style={{ cursor: 'move' }}>
+                                                                                        <PiDotsSixVerticalBold />
+                                                                                    </IconButton>
+                                                                                </Box>
+                                                                            </div>
+                                                                        )}
+                                                                    </Draggable>
+                                                                ))}
+
+                                                                {provided.placeholder}
+                                                                <Box sx={{ cursor: 'pointer' }} onClick={handleAddSubtask} style={{ margin: "10px", color: "#1976d3" }}>
+                                                                    <FiPlusCircle /> Add Subtasks
+                                                                </Box>
+                                                            </div>
+                                                        )}
+                                                    </Droppable>
+                                                )}
+
+                                            </DragDropContext>
+                                        </div>
+                                    </Grid>
                             </Grid>
                             <Divider mt={2} />
                             <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>

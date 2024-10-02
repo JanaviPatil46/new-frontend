@@ -310,7 +310,7 @@ const InvoiceTemp = () => {
         toast.error(errorMessage);
       });
   }
-  const createSaveInvoiceTemp= () => {
+  const createSaveInvoiceTemp = () => {
     if (!validateForm()) {
       return; // Prevent form submission if validation fails
     }
@@ -359,9 +359,9 @@ const InvoiceTemp = () => {
         toast.success("Invoice created successfully");
 
         if (result && result.message === "InvoiceTemplate created successfully") {
-        
+
           fetchInvoiceTemplates();
-       
+
         } else {
           // toast.error(result.message || "Failed to create InvoiceTemplate");
         }
@@ -425,34 +425,34 @@ const InvoiceTemp = () => {
   const handleDelete = (_id) => {
     // Show a confirmation prompt
     const isConfirmed = window.confirm("Are you sure you want to delete this invoice template?");
-        
+
     // Proceed with deletion if confirmed
     if (isConfirmed) {
-    const requestOptions = {
-      method: "DELETE",
-      redirect: "follow",
-    };
+      const requestOptions = {
+        method: "DELETE",
+        redirect: "follow",
+      };
 
-    const url = `${INVOICE_API}/workflow/invoicetemp/invoicetemplate/${_id}`;
+      const url = `${INVOICE_API}/workflow/invoicetemp/invoicetemplate/${_id}`;
 
-    fetch(url, requestOptions)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Failed to delete item');
-        }
-        return response.text();
-      })
-      .then((result) => {
-        console.log(result);
+      fetch(url, requestOptions)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Failed to delete item');
+          }
+          return response.text();
+        })
+        .then((result) => {
+          console.log(result);
 
-        toast.success('Item deleted successfully');
-        fetchInvoiceTemplates();
-      })
-      .catch((error) => {
-        console.error(error);
+          toast.success('Item deleted successfully');
+          fetchInvoiceTemplates();
+        })
+        .catch((error) => {
+          console.error(error);
 
-        toast.error('Failed to delete item');
-      });
+          toast.error('Failed to delete item');
+        });
     }
   };
   // services data
@@ -489,13 +489,16 @@ const InvoiceTemp = () => {
         console.log(result.serviceTemplate);
 
         const service = Array.isArray(result.serviceTemplate) ? result.serviceTemplate[0] : result.serviceTemplate;
-
+        // const rate = typeof service.rate === 'number' ? service.rate : 0;
+        const rate = service.rate ? parseFloat(service.rate.replace('$', '')) : 0;
         const updatedRow = {
           productName: service.serviceName || '', // Assuming serviceName corresponds to productName
           description: service.description || '',
-          rate: service.rate ? `$${service.rate.toFixed(2)} ` : '$0.00',
+          // rate: service.rate ? `$${rate.toFixed(2)} ` : '$0.00',
+          rate: `$${rate.toFixed(2)}`,
           qty: '1', // Default quantity is 1
-          amount: service.rate ? `$${service.rate.toFixed(2)}` : '$0.00', // Assuming amount is calculated as rate
+          amount: `$${rate.toFixed(2)}`,
+          // amount: service.rate ? `$${service.rate.toFixed(2)}` : '$0.00', // Assuming amount is calculated as rate
           tax: service.tax || false,
           isDiscount: false // Default value if not present in the service object
         };
@@ -679,7 +682,7 @@ const InvoiceTemp = () => {
 
     if (!templatename) {
       setTemplatenameError("Template name is required");
-      
+
       isValid = false;
     } else {
       setTemplatenameError('');
@@ -1043,16 +1046,16 @@ const InvoiceTemp = () => {
                           </Typography>
                         </Box>
 
-                        <Box sx={{ overflowX: 'auto', width: '100%' }}>
-                          <Table>
+                        {/* <Box sx={{ overflowX: 'auto', width: '100%',border:'2px solid red' }}>
+                          <Table sx={{}}>
                             <TableHead>
                               <TableRow>
-                                <TableCell >PRODUCT OR SERVICE</TableCell>
-                                <TableCell>DESCRIPTION</TableCell>
-                                <TableCell>RATE</TableCell>
-                                <TableCell>QTY</TableCell>
-                                <TableCell>AMOUNT</TableCell>
-                                <TableCell>TAX</TableCell>
+                                <TableCell >Product or service</TableCell>
+                                <TableCell>Description</TableCell>
+                                <TableCell>Tax</TableCell>
+                                <TableCell>Rate</TableCell>
+                                <TableCell>Qty</TableCell>
+                                <TableCell>Amount</TableCell>
                                 <TableCell />
                                 <TableCell />
                               </TableRow>
@@ -1061,11 +1064,12 @@ const InvoiceTemp = () => {
                               {rows.map((row, index) => (
                                 <TableRow key={index}>
 
-                                  <TableCell>
+                                  <TableCell >
+                                    
                                     <CreatableSelect
                                       placeholder="Product or Service"
                                       options={serviceoptions}
-                                      value={serviceoptions.find(option => option.label === row.productName) || { label: row.productName, value: row.productName }}
+                                      value={row.productName ? serviceoptions.find(option => option.label === row.productName) || { label: row.productName, value: row.productName } : null}
                                       onChange={(selectedOption) => handleServiceChange(index, selectedOption)}
                                       onInputChange={(inputValue, actionMeta) => handleServiceInputChange(inputValue, actionMeta, index)}
                                       isClearable
@@ -1077,7 +1081,6 @@ const InvoiceTemp = () => {
                                         control: (provided) => ({
                                           ...provided,
                                           width: '180px',
-
                                         }),
                                       }}
                                     />
@@ -1111,49 +1114,138 @@ const InvoiceTemp = () => {
                               ))}
                             </TableBody>
                           </Table>
-                        </Box>
+                        </Box> */}
+                        <Box sx={{ overflow: 'auto', width: '100%',  }}>
+                          <Table>
+                            <TableHead>
+                              <TableRow>
+                                <TableCell sx={{ position: 'sticky', left: 0, backgroundColor: 'white', zIndex: 1 }}>Product or service</TableCell>
+                                <TableCell>Description</TableCell>
+                                <TableCell>Rate</TableCell>
+                                <TableCell>Qty</TableCell>
+                                <TableCell>Amount</TableCell>
+                                <TableCell>Tax</TableCell>
+                                <TableCell />
+                                <TableCell />
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {rows.map((row, index) => (
+                                <TableRow key={index}>
+                                  <TableCell sx={{ position: 'sticky', left: 0, backgroundColor: 'white', zIndex: 1 }}>
+                                    <CreatableSelect
+                                      placeholder="Product or Service"
+                                      options={serviceoptions}
+                                      value={row.productName ? serviceoptions.find(option => option.label === row.productName) || { label: row.productName, value: row.productName } : null}
+                                      onChange={(selectedOption) => handleServiceChange(index, selectedOption)}
+                                      isClearable
+                                      styles={{
+                                        container: (provided) => ({ ...provided, width: '180px' }),
+                                        control: (provided) => ({ ...provided, width: '180px' }),
+                                        menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
+                                      }}
+                                      menuPortalTarget={document.body}
+                                    />
+                                  </TableCell>
 
+                                  <TableCell>
+                                    <input
+                                      type="text"
+                                      name="description"
+                                      value={row.description}
+                                      onChange={(e) => handleInputChange(index, e)}
+                                      style={{ border: 'none' }}
+                                      placeholder="Description"
+                                    />
+                                  </TableCell>
+
+                                  <TableCell>
+                                    <input
+                                      type="text"
+                                      name="rate"
+                                      value={row.rate}
+                                      onChange={(e) => handleInputChange(index, e)}
+                                      style={{ border: 'none' }}
+                                    />
+                                  </TableCell>
+
+                                  <TableCell>
+                                    <input
+                                      type="text"
+                                      name="qty"
+                                      value={row.qty}
+                                      onChange={(e) => handleInputChange(index, e)}
+                                      style={{ border: 'none' }}
+                                    />
+                                  </TableCell>
+
+                                  <TableCell>{row.amount}</TableCell>
+
+                                  <TableCell>
+                                    <Checkbox
+                                      name="tax"
+                                      checked={row.tax}
+                                      onChange={(e) => handleInputChange(index, e)}
+                                    />
+                                  </TableCell>
+
+                                  <TableCell>
+                                    <IconButton>
+                                      <BsThreeDotsVertical />
+                                    </IconButton>
+                                  </TableCell>
+
+                                  <TableCell>
+                                    <IconButton onClick={() => deleteRow(index)}>
+                                      <RiCloseLine />
+                                    </IconButton>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px', marginTop: '10px' }}>
-                          <Button onClick={() => addRow()} startIcon={<AiOutlinePlusCircle />} sx={{ color: 'blue', fontSize: '18px' }}>
+                          <Button onClick={() => addRow()} startIcon={<AiOutlinePlusCircle />} sx={{ color: 'blue', fontSize: '15px' }}>
                             Line item
                           </Button>
-                          <Button onClick={() => addRow(true)} startIcon={<CiDiscount1 />} sx={{ color: 'blue', fontSize: '18px' }}>
+                          <Button onClick={() => addRow(true)} startIcon={<CiDiscount1 />} sx={{ color: 'blue', fontSize: '15px' }}>
                             Discount
                           </Button>
                         </Box>
 
-                        <div className='one-time-summary' style={{ marginTop: '20px' }}>
+                        <div className='one-time-summary' style={{}}>
                           <Typography variant="h6">Summary</Typography>
                           <Table sx={{ backgroundColor: '#fff' }}>
-                            <TableHead>
-                              <TableRow>
-                                <TableCell>SUBTOTAL</TableCell>
-                                <TableCell>TAX RATE</TableCell>
-                                <TableCell>TAX TOTAL</TableCell>
-                                <TableCell>TOTAL</TableCell>
+                            <TableHead sx={{ height: '5px', }}>
+                              <TableRow >
+                                <TableCell sx={{ width: '10%', }}>Subtotal</TableCell>
+                                <TableCell sx={{ width: '10%', }}>Tax Rate</TableCell>
+                                <TableCell sx={{ width: '10%', }}>Tax Total</TableCell>
+                                <TableCell sx={{ width: '10%', }}>Total</TableCell>
                               </TableRow>
                             </TableHead>
                             <TableBody>
                               <TableRow>
                                 <TableCell>
-                                  <Box sx={{display:'flex',alignItems:'center'}}>
-                                  $<input
-                                    // type="number"
-                                    value={subtotal}
-                                    onChange={handleSubtotalChange}
-                                    style={{ border: 'none', width:'50%' }}
-                                  />
+                                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    $<input
+                                      // type="number"
+                                      value={subtotal}
+                                      onChange={handleSubtotalChange}
+                                      style={{ border: 'none', width: '50%' }}
+                                    />
                                   </Box>
-                                 
+
                                 </TableCell>
                                 <TableCell>
-                                <Box sx={{display:'flex',alignItems:'center'}}>
-                                  <input
-                                    // type="number"
-                                    value={taxRate}
-                                    onChange={handleTaxRateChange}
-                                    style={{ border: 'none', width:'50%' }}
-                                  />%
+                                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <input
+                                      // type="number"
+                                      value={taxRate}
+                                      onChange={handleTaxRateChange}
+                                      style={{ border: 'none', width: '50%' }}
+                                    />%
                                   </Box>
                                 </TableCell>
                                 <TableCell>${taxTotal.toFixed(2)}</TableCell>
@@ -1185,7 +1277,7 @@ const InvoiceTemp = () => {
                 </Grid>
                 <Divider mt={2} />
                 <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-                <Button onClick={createInvoiceTemp} variant="contained" color="primary" >Save & exit</Button>
+                  <Button onClick={createInvoiceTemp} variant="contained" color="primary" >Save & exit</Button>
                   <Button onClick={createSaveInvoiceTemp} variant="contained" color="primary" >Save</Button>
                   <Button variant="outlined" onClick={handleCloseInvoiceTemp}>Cancel</Button>
                 </Box>
@@ -1199,3 +1291,26 @@ const InvoiceTemp = () => {
 };
 
 export default InvoiceTemp;
+
+
+
+
+{/* <CreatableSelect
+                                      placeholder="Product or Service"
+                                      options={serviceoptions}
+                                      value={serviceoptions.find(option => option.label === row.productName) || { label: row.productName, value: row.productName }}
+                                      onChange={(selectedOption) => handleServiceChange(index, selectedOption)}
+                                      onInputChange={(inputValue, actionMeta) => handleServiceInputChange(inputValue, actionMeta, index)}
+                                      isClearable
+                                      styles={{
+                                        container: (provided) => ({
+                                          ...provided,
+                                          width: '180px',
+                                        }),
+                                        control: (provided) => ({
+                                          ...provided,
+                                          width: '180px',
+
+                                        }),
+                                      }}
+                                    /> */}

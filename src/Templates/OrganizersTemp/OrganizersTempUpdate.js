@@ -493,15 +493,45 @@ const OrganizersTempUpdate = () => {
   ).length || 0;
 
   // Check whether to display the section
+  // const shouldShowSection = (section) => {
+  //   if (!section.sectionsettings?.conditional) return true;
+
+  //   const condition = section.sectionsettings?.conditions?.[0];
+  //   if (condition && condition.question && condition.answer) {
+  //     return condition.answer === radioValues[condition.question];
+  //   }
+  //   return true;
+  // };
   const shouldShowSection = (section) => {
     if (!section.sectionsettings?.conditional) return true;
 
     const condition = section.sectionsettings?.conditions?.[0];
     if (condition && condition.question && condition.answer) {
-      return condition.answer === radioValues[condition.question];
+        const radioAnswer = radioValues[condition.question];
+        const checkboxAnswer = checkboxValues[condition.question];
+        const dropdownAnswer = selectedDropdownValue;
+
+        // For radio buttons
+        if (radioAnswer !== undefined && condition.answer === radioAnswer) {
+            return true;
+        }
+
+        // For checkboxes: check if the condition answer is in the selected checkbox values
+        if (checkboxAnswer && checkboxAnswer[condition.answer]) {
+            return true;
+        }
+
+        // For dropdowns: check if the condition answer matches the selected dropdown value
+        if (dropdownAnswer !== undefined && condition.answer === dropdownAnswer) {
+            return true;
+        }
+
+        return false;
     }
+
     return true;
-  };
+};
+
   // const getVisibleSections = () => {
   //     return sections.filter(shouldShowSection);
   // };

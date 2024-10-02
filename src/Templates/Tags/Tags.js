@@ -39,9 +39,11 @@ const Tags = () => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`${TAGS_API}/tags/`);
+      const response = await fetch(`${TAGS_API}/tags/accountcountoftag/account`);
       const data = await response.json();
-      setTags(data.tags);
+      setTags(data.tagCounts);
+      
+
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -130,6 +132,7 @@ const Tags = () => {
     } else {
       setTagNameError('');
     }
+    return isValid;
   }
   console.log(tagidget);
   const handleDelete = (_id) => {
@@ -176,16 +179,23 @@ const Tags = () => {
     handleDrawerClose();
   };
 
+
   const handleSubmit = () => {
+    // Prevent form submission if validation fails
     if (!validateForm()) {
-      return; // Prevent form submission if validation fails
-    }
+        return; 
+    } 
+
+    // Proceed only if an option is selected
     if (selectedOption) {
-      const { tagName, tagColour } = selectedOption;
-      sendApiData(tagName, tagColour);
+        const { tagName, tagColour } = selectedOption;
+        sendApiData(tagName, tagColour);
     }
+
+    // Clear the form regardless of selection
     handleClear();
-  };
+};
+
 
   const sendApiData = (tagName, tagColour) => {
     const myHeaders = new Headers();
@@ -203,6 +213,7 @@ const Tags = () => {
     fetch(`${TAGS_API}/tags/`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
+        console.log(result)
         if (result && result.message === "Tag with this TagName already exists") {
           toast.success('Tag with this TagName already exists');
           // fetchData();
@@ -284,7 +295,9 @@ const Tags = () => {
         </span>
       ),
     },
-    { accessorKey: 'accounts', header: 'Accounts' },
+    { accessorKey: 'count', header: 'Accounts',
+
+     },
     { accessorKey: 'archivedAccounts', header: 'Archived accounts' },
     { accessorKey: 'pendingTasks', header: 'Pending tasks' },
     { accessorKey: 'completedTasks', header: 'Completed tasks' },
@@ -327,6 +340,7 @@ const Tags = () => {
         backgroundColor: theme.palette.mode === "dark-theme" ? theme.palette.grey[900] : theme.palette.grey[50],
       }),
     },
+    
   });
 
 

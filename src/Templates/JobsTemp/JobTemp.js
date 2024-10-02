@@ -596,40 +596,19 @@ const JobTemp = () => {
   });
   const [errors, setErrors] = useState({});
  
-  const [startInError, setStartInError] = useState('');
-  const [dueInError, setDueInError] = useState('');
-  const [durationError, setDurationError] = useState('');
+ 
   const validateForm = () => {
     let tempErrors = {};
     let isValid = true;
     if (!templatename) tempErrors.templatename = "Template name is required";
     if (!jobName) tempErrors.jobName = "Job name is required";
-    if (selectedUser.length === 0) tempErrors.selectedUser = "At least one assignee is required";
+    
 
 
-    if (!absoluteDate) {
-      if (!startsin) {
-        setStartInError('Start in value is required');
-        isValid = false;
-      } else {
-        setStartInError('');
-      }
-      if (!duein) {
-        setDueInError('Due in value is required');
-        isValid = false;
-      } else {
-        setDueInError('');
-      }
-      if (!startsInDuration || !dueinduration) {
-        setDurationError('Duration is required');
-        isValid = false;
-      } else {
-        setDurationError('');
-      }
-    } 
+    
 
     setErrors(tempErrors);
-
+    // return isValid;
     return Object.keys(tempErrors).length === 0;
   };
   return (
@@ -782,25 +761,9 @@ const JobTemp = () => {
                     )}
                     renderInput={(params) => (
                       <>
-                        <TextField {...params} error={!!errors.selectedUser}
+                        <TextField {...params} 
                           variant="outlined" placeholder="Assignees" />
-                        {(!!errors.selectedUser) && <Alert sx={{
-                          width: '96%',
-                          p: '0', // Adjust padding to control the size
-                          pl: '4%', height: '23px',
-                          borderRadius: '10px',
-                          borderTopLeftRadius: '0',
-                          borderTopRightRadius: '0',
-                          fontSize: '15px',
-                          display: 'flex',
-                          alignItems: 'center', // Center content vertically
-                          '& .MuiAlert-icon': {
-                            fontSize: '16px', // Adjust the size of the icon
-                            mr: '8px', // Add margin to the right of the icon
-                          },
-                        }} variant="filled" severity="error" >
-                          {errors.selectedUser}
-                        </Alert>}
+                       
                       </>
                     )}
                     isOptionEqualToValue={(option, value) => option.value === value.value}
@@ -867,32 +830,9 @@ const JobTemp = () => {
                           value={startsin}
                           sx={{ background: "#fff", width: '100%' }}
                           onChange={(e) => setstartsin(e.target.value)}
-                          error={!!startInError}
+                         
                         />
-                        {(!!startInError) && (
-                          <Alert
-                            sx={{
-                              width: '96%',
-                              p: '0',
-                              pl: '4%',
-                              height: '23px',
-                              borderRadius: '10px',
-                              borderTopLeftRadius: '0',
-                              borderTopRightRadius: '0',
-                              fontSize: '15px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              '& .MuiAlert-icon': {
-                                fontSize: '16px',
-                                mr: '8px',
-                              },
-                            }}
-                            variant="filled"
-                            severity="error"
-                          >
-                            {startInError}
-                          </Alert>
-                        )}
+                       
                       </Grid>
                       <Grid item xs={12} sm={5}>
                         <Autocomplete
@@ -908,30 +848,7 @@ const JobTemp = () => {
                                 sx={{ backgroundColor: "#fff" }}
 
                               />
-                              {!!durationError && (
-                                <Alert
-                                  sx={{
-                                    width: '96%',
-                                    p: '0',
-                                    pl: '4%',
-                                    height: '23px',
-                                    borderRadius: '10px',
-                                    borderTopLeftRadius: '0',
-                                    borderTopRightRadius: '0',
-                                    fontSize: '13px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    '& .MuiAlert-icon': {
-                                      fontSize: '16px',
-                                      mr: '8px',
-                                    },
-                                  }}
-                                  variant="filled"
-                                  severity="error"
-                                >
-                                  {durationError}
-                                </Alert>
-                              )}
+                            
                             </>
                           )}
                           value={dayOptions.find((option) => option.value === startsInDuration) || null}
@@ -949,34 +866,11 @@ const JobTemp = () => {
                           placeholder='0'
                           value={duein}
                           fullWidth
-                          error={!!dueInError}
+                          
                           sx={{ background: '#fff', }}
                           onChange={(e) => setduein(e.target.value)}
                         />
-                        {(!!dueInError) && (
-                          <Alert
-                            sx={{
-                              width: '96%',
-                              p: '0',
-                              pl: '4%',
-                              height: '23px',
-                              borderRadius: '10px',
-                              borderTopLeftRadius: '0',
-                              borderTopRightRadius: '0',
-                              fontSize: '15px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              '& .MuiAlert-icon': {
-                                fontSize: '16px',
-                                mr: '8px',
-                              },
-                            }}
-                            variant="filled"
-                            severity="error"
-                          >
-                            {dueInError}
-                          </Alert>
-                        )}
+                        
                       </Grid>
                       <Grid item xs={12} sm={5}>
                         <Autocomplete
@@ -987,30 +881,7 @@ const JobTemp = () => {
                           renderInput={(params) => (
                             <>
                               <TextField {...params} variant="outlined" sx={{ backgroundColor: '#fff' }} />
-                              {!!durationError && (
-                                <Alert
-                                  sx={{
-                                    width: '96%',
-                                    p: '0',
-                                    pl: '4%',
-                                    height: '23px',
-                                    borderRadius: '10px',
-                                    borderTopLeftRadius: '0',
-                                    borderTopRightRadius: '0',
-                                    fontSize: '13px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    '& .MuiAlert-icon': {
-                                      fontSize: '16px',
-                                      mr: '8px',
-                                    },
-                                  }}
-                                  variant="filled"
-                                  severity="error"
-                                >
-                                  {durationError}
-                                </Alert>
-                              )}
+                             
                             </>
                           )}
                           value={dayOptions.find((option) => option.value === dueinduration) || null}

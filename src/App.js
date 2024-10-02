@@ -108,7 +108,8 @@ const App = () => {
             <Route path='proposals' element={<ProposalTemp />} />
           </Route>
           <Route path='/firmtemp/teammember' element={<TeamMember/>}/>
-          <Route path='/firmtemp/services' element={<Services/>}/>
+          {/* <Route path='/firmtemp/services' element={<Services/>}/> */}
+          <Route path='/firmtemp/service'  element={<Services/>}/>
           {/* <Route path='/firmtemp/services/ServicesUpdate/:id' element={ServicesUpdate}/> */}
           <Route path='/servicesUpdate/:id' element={<ServicesUpdate/>}/>
           <Route path='/settings/myaccount' element={<MyAccount/>}/>

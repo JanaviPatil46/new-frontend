@@ -449,13 +449,15 @@ const[numOfReminder,setnumOfReminder]=useState();
         console.log(result.serviceTemplate);
 
         const service = Array.isArray(result.serviceTemplate) ? result.serviceTemplate[0] : result.serviceTemplate;
-
+        const rate = service.rate ? parseFloat(service.rate.replace('$', '')) : 0;
         const updatedRow = {
           productName: service.serviceName || '', // Assuming serviceName corresponds to productName
           description: service.description || '',
-          rate: service.rate ? `$${service.rate.toFixed(2)} ` : '$0.00',
+          rate: `$${rate.toFixed(2)}`,
+          // rate: service.rate ? `$${service.rate.toFixed(2)} ` : '$0.00',
           qty: '1', // Default quantity is 1
-          amount: service.rate ? `$${service.rate.toFixed(2)}` : '$0.00', // Assuming amount is calculated as rate
+          amount: `$${rate.toFixed(2)}`,
+          // amount: service.rate ? `$${service.rate.toFixed(2)}` : '$0.00', // Assuming amount is calculated as rate
           tax: service.tax || false,
           isDiscount: false // Default value if not present in the service object
         };
@@ -597,7 +599,7 @@ const[numOfReminder,setnumOfReminder]=useState();
                 <Typography variant='h5' gutterBottom>Edit Invoice Template</Typography>
                 <Box mt={2} mb={2}><hr /></Box>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={3} mt={2}>
+                  <Grid item xs={12} sm={5.8} mt={2}>
                     <Box>
 
                       <Box>
@@ -843,19 +845,19 @@ const[numOfReminder,setnumOfReminder]=useState();
 
                     </Box>
                   </Grid>
-                  <Grid item xs={12} sm={1} sx={{ display: { xs: 'none', sm: 'block' } }}>
+                  <Grid item xs={12} sm={0.4} sx={{ display: { xs: 'none', sm: 'block' } }}>
 
 
-                    <Box
+                    <Box className='vertical-line'
                       sx={{
-                        borderLeft: '1px solid black',
+                        // borderLeft: '1px solid black',
                         height: '100%',
-                        margin: '0 20px',
+                        ml: 1.5
 
                       }}
                     ></Box>
                   </Grid>
-                  <Grid item xs={26} sm={8} >
+                  <Grid item xs={26} sm={5.8} >
                     <Box className='invoice-section-three'>
 
                       <div className='invoice-section-three'>
@@ -866,7 +868,7 @@ const[numOfReminder,setnumOfReminder]=useState();
                           </Typography>
                         </Box>
 
-                        <Box sx={{ overflowX: 'auto', width: '100%' }}>
+                        {/* <Box sx={{ overflowX: 'auto', width: '100%' }}>
                           <Table>
                             <TableHead>
                               <TableRow>
@@ -933,26 +935,115 @@ const[numOfReminder,setnumOfReminder]=useState();
                               ))}
                             </TableBody>
                           </Table>
-                        </Box>
+                        </Box> */}
+<Box sx={{ overflow: 'auto', width: '100%',  }}>
+                          <Table>
+                            <TableHead>
+                              <TableRow>
+                                <TableCell sx={{ position: 'sticky', left: 0, backgroundColor: 'white', zIndex: 1 }}>Product or service</TableCell>
+                                <TableCell>Description</TableCell>
+                                <TableCell>Rate</TableCell>
+                                <TableCell>Qty</TableCell>
+                                <TableCell>Amount</TableCell>
+                                <TableCell>Tax</TableCell>
+                                <TableCell />
+                                <TableCell />
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {rows.map((row, index) => (
+                                <TableRow key={index}>
+                                  <TableCell sx={{ position: 'sticky', left: 0, backgroundColor: 'white', zIndex: 1 }}>
+                                    <CreatableSelect
+                                      placeholder="Product or Service"
+                                      options={serviceoptions}
+                                      value={row.productName ? serviceoptions.find(option => option.label === row.productName) || { label: row.productName, value: row.productName } : null}
+                                      onChange={(selectedOption) => handleServiceChange(index, selectedOption)}
+                                      isClearable
+                                      styles={{
+                                        container: (provided) => ({ ...provided, width: '180px' }),
+                                        control: (provided) => ({ ...provided, width: '180px' }),
+                                        menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
+                                      }}
+                                      menuPortalTarget={document.body}
+                                    />
+                                  </TableCell>
 
+                                  <TableCell>
+                                    <input
+                                      type="text"
+                                      name="description"
+                                      value={row.description}
+                                      onChange={(e) => handleInputChange(index, e)}
+                                      style={{ border: 'none' }}
+                                      placeholder="Description"
+                                    />
+                                  </TableCell>
+
+                                  <TableCell>
+                                    <input
+                                      type="text"
+                                      name="rate"
+                                      value={row.rate}
+                                      onChange={(e) => handleInputChange(index, e)}
+                                      style={{ border: 'none' }}
+                                    />
+                                  </TableCell>
+
+                                  <TableCell>
+                                    <input
+                                      type="text"
+                                      name="qty"
+                                      value={row.qty}
+                                      onChange={(e) => handleInputChange(index, e)}
+                                      style={{ border: 'none' }}
+                                    />
+                                  </TableCell>
+
+                                  <TableCell>{row.amount}</TableCell>
+
+                                  <TableCell>
+                                    <Checkbox
+                                      name="tax"
+                                      checked={row.tax}
+                                      onChange={(e) => handleInputChange(index, e)}
+                                    />
+                                  </TableCell>
+
+                                  <TableCell>
+                                    <IconButton>
+                                      <BsThreeDotsVertical />
+                                    </IconButton>
+                                  </TableCell>
+
+                                  <TableCell>
+                                    <IconButton onClick={() => deleteRow(index)}>
+                                      <RiCloseLine />
+                                    </IconButton>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px', marginTop: '10px' }}>
-                          <Button onClick={() => addRow()} startIcon={<AiOutlinePlusCircle />} sx={{ color: 'blue', fontSize: '18px' }}>
+                          <Button onClick={() => addRow()} startIcon={<AiOutlinePlusCircle />} sx={{ color: 'blue', fontSize: '15px' }}>
                             Line item
                           </Button>
-                          <Button onClick={() => addRow(true)} startIcon={<CiDiscount1 />} sx={{ color: 'blue', fontSize: '18px' }}>
+                          <Button onClick={() => addRow(true)} startIcon={<CiDiscount1 />} sx={{ color: 'blue', fontSize: '15px' }}>
                             Discount
                           </Button>
                         </Box>
 
-                        <div className='one-time-summary' style={{ marginTop: '20px' }}>
+                        <div className='one-time-summary' >
                           <Typography variant="h6">Summary</Typography>
                           <Table sx={{ backgroundColor: '#fff' }}>
                             <TableHead>
                               <TableRow>
-                                <TableCell>SUBTOTAL</TableCell>
-                                <TableCell>TAX RATE</TableCell>
-                                <TableCell>TAX TOTAL</TableCell>
-                                <TableCell>TOTAL</TableCell>
+                              <TableCell sx={{ width: '10%', }}>Subtotal</TableCell>
+                                <TableCell sx={{ width: '10%', }}>Tax Rate</TableCell>
+                                <TableCell sx={{ width: '10%', }}>Tax Total</TableCell>
+                                <TableCell sx={{ width: '10%', }}>Total</TableCell>
                               </TableRow>
                             </TableHead>
                             <TableBody>
@@ -992,14 +1083,14 @@ const[numOfReminder,setnumOfReminder]=useState();
                           </Table>
                         </div>
                       </div>
-                      <Box style={{ display: 'flex', alignItems: 'center', gap: '20px', marginTop: '20px' }}>
+                      {/* <Box style={{ display: 'flex', alignItems: 'center', gap: '20px', marginTop: '20px' }}>
                         <Box onClick={() => addRow()} style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', color: 'blue', fontSize: '18px' }}>
                           <AiOutlinePlusCircle /> Line item
                         </Box>
                         <Box onClick={() => addRow(true)} style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', color: 'blue', fontSize: '18px' }}>
                           <CiDiscount1 /> Discount
                         </Box>
-                      </Box>
+                      </Box> */}
 
 
 

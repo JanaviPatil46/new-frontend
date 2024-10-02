@@ -174,7 +174,7 @@ const ServiceUpdate = () => {
 };
 
 const handleBack = ()=>{
-  navigate('/firmtemp/services');
+  navigate('/firmtemp/service');
 }
   return (
     <Box>
