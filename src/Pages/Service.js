@@ -24,13 +24,19 @@ const Service = () => {
     const [isNewDrawerOpen, setIsNewDrawerOpen] = useState(false);
     const [servicename, setservicename] = useState("");
     const [discription, setdiscription] = useState("");
-    const [rate, setrate] = useState("")
+    const [rate, setrate] = useState("$ 0.00")
 
     const [service, setService] = useState(false)
     const [categorycreate, setcategorycreate] = useState();
 
     const [selectedCategory, setSelectedCategory] = useState(null);
-
+    const handleRateChange = (e) => {
+        // Remove the dollar sign and any non-numeric characters, and keep the input as a number
+        const value = e.target.value.replace(/[^0-9.]/g, '');
+        
+        // Update the rate, ensuring it includes the $ symbol
+        setrate(`$ ${value}`);
+      };
     const handleCategoryChange = (event, newValue) => {
         setSelectedCategory(newValue);
     };
@@ -410,7 +416,10 @@ const Service = () => {
                                                 placeholder="Rate"
                                                 size="small"
                                                 margin='normal'
-                                                onChange={(e) => setrate(e.target.value)}
+                                                value={rate}
+                                                // onChange={(e) => setrate(e.target.value)}
+                                                onChange={handleRateChange}
+
                                             />
                                         </Box>
                                     </Grid>

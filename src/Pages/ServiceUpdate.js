@@ -98,8 +98,14 @@ const ServiceUpdate = () => {
   const [templateData, setTemplateData] = useState(null);
 
 
-  const [rate, setrate] = useState("")
-
+  const [rate, setrate] = useState("$ 0.00")
+  const handleRateChange = (e) => {
+    // Remove the dollar sign and any non-numeric characters, and keep the input as a number
+    const value = e.target.value.replace(/[^0-9.]/g, '');
+    
+    // Update the rate, ensuring it includes the $ symbol
+    setrate(`$ ${value}`);
+  };
   const [servicename, setservicename] = useState("");
   const [discription, setdiscription] = useState("");
   const [selectedOption, setSelectedOption] = useState('');
@@ -164,7 +170,7 @@ const ServiceUpdate = () => {
         .then((result) => {
             console.log(result)
             toast.success("ServiceTemplate Updated successfully");
-            navigate('/firmtemp/services');
+            navigate('/firmtemp/service');
         })
         .catch((error) => {
             console.log(error)
@@ -218,8 +224,11 @@ const handleBack = ()=>{
                     placeholder="Rate"
                     size="small"
                     margin='normal'
+                    // value={rate}
+                    // onChange={(e) => setrate(e.target.value)}
                     value={rate}
-                    onChange={(e) => setrate(e.target.value)}
+                    // onChange={(e) => setrate(e.target.value)}
+                    onChange={handleRateChange}
                   />
                 </Box>
               </Grid>

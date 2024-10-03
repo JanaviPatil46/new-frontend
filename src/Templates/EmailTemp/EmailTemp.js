@@ -16,12 +16,18 @@ import {
     Popover,
     TextField,
     Autocomplete,
-    Alert
+    Alert,
+    Input
 } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { CiMenuKebab } from "react-icons/ci";
 import EditorShortcodes from '../Texteditor/EditorShortcodes';
+import Grid from '@mui/material/Unstable_Grid2';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'; // For file icon
+import DeleteIcon from '@mui/icons-material/Delete'; // For delete icon
+import { useCallback } from 'react';
+import { useDropzone } from 'react-dropzone';
 
 const EmailTemp = () => {
 
@@ -164,7 +170,7 @@ const EmailTemp = () => {
     };
     const handleCloseDropdown = () => {
         setAnchorEl(null);
-          setShowDropdown(false);
+        setShowDropdown(false);
     };
 
 
@@ -196,28 +202,80 @@ const EmailTemp = () => {
         value: user._id,
         label: user.username,
     }));
-    const handleSaveExitTemplate = (e) => {
+
+    // const handleSaveExitTemplate = (e) => {
+    //     e.preventDefault();
+    //     if (!validateForm()) {
+    //         return; // Prevent form submission if validation fails
+    //     }
+    //     const myHeaders = new Headers();
+    //     myHeaders.append("Content-Type", "application/json");
+
+    //     const raw = JSON.stringify({
+    //         templatename: templateName,
+    //         from: selecteduser.value,
+    //         emailsubject: inputText,
+    //         emailbody: emailBody,
+    //     });
+
+    //     const requestOptions = {
+    //         method: "POST",
+    //         headers: myHeaders,
+    //         body: raw,
+    //         redirect: "follow"
+    //     };
+    //     const url = `${EMAIL_API}/workflow/emailtemplate`;
+    //     fetch(url, requestOptions)
+    //         .then((response) => {
+    //             if (!response.ok) {
+    //                 throw new Error("Network response was not ok");
+    //             }
+    //             return response.json();
+    //         })
+    //         .then((result) => {
+    //             toast.success('Email Template create successfully');
+    //             handleClearTemplate();
+    //             setShowForm(false);
+    //             fetchEmailTemplates();
+    //         })
+    //         .catch((error) => {
+    //             console.error(error);
+    //             toast.error('Failed to create Email Template');
+    //         });
+    // }
+
+   const handleSaveExitTemplate = (e) => {
         e.preventDefault();
         if (!validateForm()) {
             return; // Prevent form submission if validation fails
         }
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-
-        const raw = JSON.stringify({
-            templatename: templateName,
-            from: selecteduser.value,
-            emailsubject: inputText,
-
-            emailbody: emailBody,
+    
+        const formData = new FormData();
+        formData.append("templatename", templateName);
+        formData.append("from", selecteduser.value);
+        formData.append("emailsubject", inputText);
+        formData.append("emailbody", emailBody);
+    
+        // Append each selected file to formData
+        selectedFiles.forEach((file) => {
+            formData.append("files", file);
         });
-
+    
+        // Logging FormData contents for debugging
+        for (const [key, value] of formData.entries()) {
+            if (value instanceof File) {
+                console.log(`${key}: ${value.name} (size: ${value.size} bytes)`); // Logging file name and size
+            } else {
+                console.log(`${key}: ${value}`);
+            }
+        }       
+    
         const requestOptions = {
             method: "POST",
-            headers: myHeaders,
-            body: raw,
+            body: formData,
             redirect: "follow"
         };
+    
         const url = `${EMAIL_API}/workflow/emailtemplate`;
         fetch(url, requestOptions)
             .then((response) => {
@@ -227,38 +285,52 @@ const EmailTemp = () => {
                 return response.json();
             })
             .then((result) => {
-                toast.success('Email Template create successfully');
+                console.log(result)
+                toast.success('Email Template created successfully');
                 handleClearTemplate();
                 setShowForm(false);
                 fetchEmailTemplates();
             })
             .catch((error) => {
-                console.error(error);
+                console.error("Error creating Email Template:", error);
                 toast.error('Failed to create Email Template');
             });
-    }
+    };
+    
+    
+    
     const handleSaveTemplate = (e) => {
         e.preventDefault();
         if (!validateForm()) {
             return; // Prevent form submission if validation fails
         }
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-
-        const raw = JSON.stringify({
-            templatename: templateName,
-            from: selecteduser.value,
-            emailsubject: inputText,
-
-            emailbody: emailBody,
+    
+        const formData = new FormData();
+        formData.append("templatename", templateName);
+        formData.append("from", selecteduser.value);
+        formData.append("emailsubject", inputText);
+        formData.append("emailbody", emailBody);
+    
+        // Append each selected file to formData
+        selectedFiles.forEach((file) => {
+            formData.append("files", file);
         });
-
+    
+        // Logging FormData contents for debugging
+        for (const [key, value] of formData.entries()) {
+            if (value instanceof File) {
+                console.log(`${key}: ${value.name} (size: ${value.size} bytes)`); // Logging file name and size
+            } else {
+                console.log(`${key}: ${value}`);
+            }
+        }       
+    
         const requestOptions = {
             method: "POST",
-            headers: myHeaders,
-            body: raw,
+            body: formData,
             redirect: "follow"
         };
+    
         const url = `${EMAIL_API}/workflow/emailtemplate`;
         fetch(url, requestOptions)
             .then((response) => {
@@ -268,13 +340,14 @@ const EmailTemp = () => {
                 return response.json();
             })
             .then((result) => {
-                toast.success('Email Template create successfully');
-                // handleClearTemplate();
+                console.log(result)
+                toast.success('Email Template created successfully');
+                handleClearTemplate();
                 // setShowForm(false);
-                // fetchEmailTemplates();
+                fetchEmailTemplates();
             })
             .catch((error) => {
-                console.error(error);
+                console.error("Error creating Email Template:", error);
                 toast.error('Failed to create Email Template');
             });
     }
@@ -312,41 +385,36 @@ const EmailTemp = () => {
         fetchEmailTemplates();
     }, []);
 
-
-
-
-
     const handleEdit = (_id) => {
         navigate("emailTempUpdate/" + _id);
-
     };
 
     const handleDelete = (_id) => {
         // Show a confirmation prompt
         const isConfirmed = window.confirm("Are you sure you want to delete this email template?");
-        
+
         // Proceed with deletion if confirmed
         if (isConfirmed) {
-        const requestOptions = {
-            method: 'DELETE',
-            redirect: 'follow',
-        };
-        const url = `${EMAIL_API}/workflow/emailtemplate/`;
-        fetch(url + _id, requestOptions)
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Failed to delete item');
-                }
-                return response.json();
-            })
-            .then((result) => {
-                toast.success('Data deleted successfully');
-                fetchEmailTemplates();
+            const requestOptions = {
+                method: 'DELETE',
+                redirect: 'follow',
+            };
+            const url = `${EMAIL_API}/workflow/emailtemplate/`;
+            fetch(url + _id, requestOptions)
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('Failed to delete item');
+                    }
+                    return response.json();
+                })
+                .then((result) => {
+                    toast.success('Data deleted successfully');
+                    fetchEmailTemplates();
 
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
         }
     };
 
@@ -444,7 +512,7 @@ const EmailTemp = () => {
     const [templateNameError, setTemplateNameError] = useState('');
     const [selectedUserError, setSelectedUserError] = useState('');
     const [inputTextError, setInputTextError] = useState('');
-    
+
 
     const validateForm = () => {
         let isValid = true;
@@ -470,14 +538,59 @@ const EmailTemp = () => {
             setInputTextError('');
         }
 
-       
+
 
         return isValid;
     };
 
+    //*********************** */
+
+    const [selectedFiles, setSelectedFiles] = useState([]);
+
+    // Handle file drop
+    const onDrop = useCallback((acceptedFiles) => {
+        setSelectedFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
+    }, []);
+
+    const { getRootProps, getInputProps } = useDropzone({
+        onDrop,
+    });
+
+    const handleRemoveFile = (index) => {
+        setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    };
+
+    const handleButtonClick = (event) => {
+        event.stopPropagation(); // Prevent click event from bubbling up
+        document.getElementById('file-input').click(); // Trigger click on the hidden file input
+    };
+
+    const handleFileChange = (event) => {
+        const files = Array.from(event.target.files); // Convert FileList to array
+        setSelectedFiles((prevFiles) => [...prevFiles, ...files]); // Update selected files state
+    };
+
+    // const handleFileChange = (event) => {
+    //     const files = event.target.files; // Get the selected files
+    //     const promises = Array.from(files).map(file => {
+    //         return new Promise((resolve, reject) => {
+    //             const reader = new FileReader();
+    //             reader.onloadend = () => resolve(reader.result); // Resolve with base64 string
+    //             reader.onerror = reject;
+    //             reader.readAsDataURL(file); // Read file as Data URL (base64)
+    //         });
+    //     });
+    
+    //     Promise.all(promises)
+    //         .then(base64Strings => setFileBase64Array(base64Strings)) // Update state with base64 strings
+    //         .catch(error => console.error('Error converting files to base64:', error));
+    // };
+    
+
+console.log(selectedFiles)
+
     return (
         <Container>
-
             {!showForm ? (
                 <Box sx={{ mt: 2 }}>
                     <Button variant="contained" color="primary" onClick={handleCreateTemplate} sx={{ mb: 3 }}>
@@ -487,100 +600,33 @@ const EmailTemp = () => {
 
                 </Box>
             ) : (
-                <Box
-                    sx={{
-                        mt: 2,
-
-                    }}
-                >
-                    <Typography variant="h6" gutterBottom>
-                        Create Email Template
-                    </Typography>
-                    <form >
-                        <Box>
-
-                            <label className='email-input-label'>Template Name</label>
-
-                            <TextField
-                                sx={{ background: '#fff', mt: 2 }}
-
-                                fullWidth
-                                name="templateName"
-                                value={templateName}
-                                error={!!templateNameError}
-                                // helperText={templateNameError}
-                                onChange={(e) => setTemplateName(e.target.value)}
-                                placeholder="Template Name"
-                                size="small"
-                            />
-                            {(!!templateNameError) && <Alert sx={{
-                                width: '96%',
-                                p: '0', // Adjust padding to control the size
-                                pl: '4%', height: '23px',
-                                borderRadius: '10px',
-                                borderTopLeftRadius: '0',
-                                borderTopRightRadius: '0',
-                                fontSize: '15px',
-                                display: 'flex',
-                                alignItems: 'center', // Center content vertically
-                                '& .MuiAlert-icon': {
-                                    fontSize: '16px', // Adjust the size of the icon
-                                    mr: '8px', // Add margin to the right of the icon
-                                },
-                            }} variant="filled" severity="error" >
-                                {templateNameError}
-                            </Alert>}
-                        </Box>
-                        <Box>
-                            <Typography variant="h6" gutterBottom>
-                                Mode
-                            </Typography>
-                            <FormControl>
-                                <RadioGroup
-                                    aria-labelledby="demo-controlled-radio-buttons-group"
-                                    name="controlled-radio-buttons-group"
-                                    value={selectedOption}
-                                    onChange={handleChange}
-
-                                >
-                                    <FormControlLabel
-                                        value="contacts"
-                                        control={<Radio sx={{ color: '#ADD8E6' }} />}
-                                        label="Contact Shortcodes"
-
-                                    />
-                                    <FormControlLabel
-                                        value="account"
-                                        control={<Radio sx={{ color: '#ADD8E6' }} />}
-                                        label="Account Shortcodes"
-                                    />
-                                </RadioGroup>
-                            </FormControl>
-                        </Box>
-                        <Box>
-
-
-                            <label className='email-input-label'>From</label>
-
-
-                            <Autocomplete
-
-                                options={options}
-                                sx={{ mt: 2, mb: 2, backgroundColor: '#fff' }}
-                                size='small'
-                                value={selecteduser}
-                                onChange={handleuserChange}
-                                isOptionEqualToValue={(option, value) => option.value === value.value}
-                                getOptionLabel={(option) => option.label || ""}
-                                renderInput={(params) => (
-                                    <>
+                <>
+                    <Box display="flex" alignItems="center">
+                        <Typography variant="h6" gutterBottom>
+                            Create Email Template
+                        </Typography>
+                    </Box>
+                    <hr />
+                    <Grid container spacing={2} >
+                        <Grid xs={12} sm={5.8} >
+                            <Box
+                                sx={{ mt: 2, }}
+                            >
+                                <form >
+                                    <Box>
+                                        <label className='email-input-label'>Template Name</label>
                                         <TextField
-                                            {...params}
-                                            error={!!selectedUserError}
-                                            // helperText={selectedUserError}
-                                            placeholder="Form"
+                                            sx={{ background: '#fff', mt: 2 }}
+                                            fullWidth
+                                            name="templateName"
+                                            value={templateName}
+                                            error={!!templateNameError}
+                                            // helperText={templateNameError}
+                                            onChange={(e) => setTemplateName(e.target.value)}
+                                            placeholder="Template Name"
+                                            size="small"
                                         />
-                                        {(!!selectedUserError) && <Alert sx={{
+                                        {(!!templateNameError) && <Alert sx={{
                                             width: '96%',
                                             p: '0', // Adjust padding to control the size
                                             pl: '4%', height: '23px',
@@ -595,106 +641,255 @@ const EmailTemp = () => {
                                                 mr: '8px', // Add margin to the right of the icon
                                             },
                                         }} variant="filled" severity="error" >
-                                            {selectedUserError}
+                                            {templateNameError}
                                         </Alert>}
-                                    </>
-                                )}
-                                isClearable={true}
-
-                            />
-
-
-                        </Box>
-                        <Box>
-
-                            <label className='email-input-label'>Subject</label>
-
-                            <TextField
-                                
-                                fullWidth
-                                name="subject"
-                                value={inputText + selectedShortcut} onChange={handlechatsubject}
-                                placeholder="Subject"
-                                size="small"
-                                error={!!inputTextError}
-                                // helperText={inputTextError}
-                                sx={{ background: '#fff',mt:2 }}
-                            />
-                            {(!!inputTextError) && <Alert sx={{
-                                width: '96%',
-                                p: '0', // Adjust padding to control the size
-                                pl: '4%', height: '23px',
-                                borderRadius: '10px',
-                                borderTopLeftRadius: '0',
-                                borderTopRightRadius: '0',
-                                fontSize: '15px',
-                                display: 'flex',
-                                alignItems: 'center', // Center content vertically
-                                '& .MuiAlert-icon': {
-                                    fontSize: '16px', // Adjust the size of the icon
-                                    mr: '8px', // Add margin to the right of the icon
-                                },
-                            }} variant="filled" severity="error" >
-                                {inputTextError}
-                            </Alert>}
-                        </Box>
-                        <Box>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={toggleDropdown}
-                                sx={{ mt: 2 }}
-                            >
-                                Add Shortcode
-                            </Button>
-
-                            <Popover
-                                open={showDropdown}
-                                anchorEl={anchorEl}
-                                onClose={handleCloseDropdown}
-                                anchorOrigin={{
-                                    vertical: 'bottom',
-                                    horizontal: 'left',
-                                }}
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'left',
-                                }}
-                            >
-                                <Box >
-                                    <List className="dropdown-list" sx={{ width: '300px', height: '300px', cursor: 'pointer' }}>
-                                        {filteredShortcuts.map((shortcut, index) => (
-                                            <ListItem
-                                                key={index}
-                                                onClick={() => handleAddShortcut(shortcut.value)}
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="h6" gutterBottom>
+                                            Mode
+                                        </Typography>
+                                        <FormControl>
+                                            <RadioGroup
+                                                aria-labelledby="demo-controlled-radio-buttons-group"
+                                                name="controlled-radio-buttons-group"
+                                                value={selectedOption}
+                                                onChange={handleChange}
                                             >
-                                                <ListItemText
-                                                    primary={shortcut.title}
-                                                    primaryTypographyProps={{
-                                                        style: {
-                                                            fontWeight: shortcut.isBold ? 'bold' : 'normal',
-                                                        },
-                                                    }}
+                                                <FormControlLabel
+                                                    value="contacts"
+                                                    control={<Radio sx={{ color: '#ADD8E6' }} />}
+                                                    label="Contact Shortcodes"
                                                 />
-                                            </ListItem>
-                                        ))}
-                                    </List>
-                                </Box>
-                            </Popover>
-                        </Box>
-                        <Box sx={{ mt: 5 }}>
+                                                <FormControlLabel
+                                                    value="account"
+                                                    control={<Radio sx={{ color: '#ADD8E6' }} />}
+                                                    label="Account Shortcodes"
+                                                />
+                                            </RadioGroup>
+                                        </FormControl>
+                                    </Box>
+                                    <Box>
 
-                            <EditorShortcodes onChange={handleEditorChange} />
-                        </Box>
-                        <Box sx={{ mt: 5, display: 'flex', gap: 2 }}>
-                            <Button variant="contained" color="primary" onClick={handleSaveExitTemplate}>
-                               Save & Exit
-                            </Button>
-                            <Button variant="contained" color="primary" onClick={handleSaveTemplate}>Save</Button>
-                            <Button variant="outlined" onClick={handleTempCancle}>Cancel</Button>
-                        </Box>
-                    </form>
-                </Box>
+                                        <label className='email-input-label'>From</label>
+                                        <Autocomplete
+                                            options={options}
+                                            sx={{ mt: 2, mb: 2, backgroundColor: '#fff' }}
+                                            size='small'
+                                            value={selecteduser}
+                                            onChange={handleuserChange}
+                                            isOptionEqualToValue={(option, value) => option.value === value.value}
+                                            getOptionLabel={(option) => option.label || ""}
+                                            renderInput={(params) => (
+                                                <>
+                                                    <TextField
+                                                        {...params}
+                                                        error={!!selectedUserError}
+                                                        // helperText={selectedUserError}
+                                                        placeholder="Form"
+                                                    />
+                                                    {(!!selectedUserError) && <Alert sx={{
+                                                        width: '96%',
+                                                        p: '0', // Adjust padding to control the size
+                                                        pl: '4%', height: '23px',
+                                                        borderRadius: '10px',
+                                                        borderTopLeftRadius: '0',
+                                                        borderTopRightRadius: '0',
+                                                        fontSize: '15px',
+                                                        display: 'flex',
+                                                        alignItems: 'center', // Center content vertically
+                                                        '& .MuiAlert-icon': {
+                                                            fontSize: '16px', // Adjust the size of the icon
+                                                            mr: '8px', // Add margin to the right of the icon
+                                                        },
+                                                    }} variant="filled" severity="error" >
+                                                        {selectedUserError}
+                                                    </Alert>}
+                                                </>
+                                            )}
+                                            isClearable={true}
+                                        />
+                                    </Box>
+                                    <Box>
+                                        <label className='email-input-label'>Subject</label>
+                                        <TextField
+                                            fullWidth
+                                            name="subject"
+                                            value={inputText + selectedShortcut} onChange={handlechatsubject}
+                                            placeholder="Subject"
+                                            size="small"
+                                            error={!!inputTextError}
+                                            // helperText={inputTextError}
+                                            sx={{ background: '#fff', mt: 2 }}
+                                        />
+                                        {(!!inputTextError) && <Alert sx={{
+                                            width: '96%',
+                                            p: '0', // Adjust padding to control the size
+                                            pl: '4%', height: '23px',
+                                            borderRadius: '10px',
+                                            borderTopLeftRadius: '0',
+                                            borderTopRightRadius: '0',
+                                            fontSize: '15px',
+                                            display: 'flex',
+                                            alignItems: 'center', // Center content vertically
+                                            '& .MuiAlert-icon': {
+                                                fontSize: '16px', // Adjust the size of the icon
+                                                mr: '8px', // Add margin to the right of the icon
+                                            },
+                                        }} variant="filled" severity="error" >
+                                            {inputTextError}
+                                        </Alert>}
+                                    </Box>
+                                    <Box>
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={toggleDropdown}
+                                            sx={{ mt: 2 }}
+                                        >
+                                            Add Shortcode
+                                        </Button>
+                                        <Popover
+                                            open={showDropdown}
+                                            anchorEl={anchorEl}
+                                            onClose={handleCloseDropdown}
+                                            anchorOrigin={{
+                                                vertical: 'bottom',
+                                                horizontal: 'left',
+                                            }}
+                                            transformOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'left',
+                                            }}
+                                        >
+                                            <Box >
+                                                <List className="dropdown-list" sx={{ width: '300px', height: '300px', cursor: 'pointer' }}>
+                                                    {filteredShortcuts.map((shortcut, index) => (
+                                                        <ListItem
+                                                            key={index}
+                                                            onClick={() => handleAddShortcut(shortcut.value)}
+                                                        >
+                                                            <ListItemText
+                                                                primary={shortcut.title}
+                                                                primaryTypographyProps={{
+                                                                    style: {
+                                                                        fontWeight: shortcut.isBold ? 'bold' : 'normal',
+                                                                    },
+                                                                }}
+                                                            />
+                                                        </ListItem>
+                                                    ))}
+                                                </List>
+                                            </Box>
+                                        </Popover>
+                                    </Box>
+                                    <Box sx={{ mt: 5 }}>
+
+                                        <EditorShortcodes onChange={handleEditorChange} />
+                                    </Box>
+                                    <Box sx={{ mt: 5, display: 'flex', gap: 2 }}>
+                                        <Button variant="contained" color="primary" onClick={handleSaveExitTemplate}>
+                                            Save & Exit
+                                        </Button>
+                                        <Button variant="contained" color="primary" onClick={handleSaveTemplate}>Save</Button>
+                                        <Button variant="outlined" onClick={handleTempCancle}>Cancel</Button>
+                                    </Box>
+                                </form>
+                            </Box>
+                        </Grid>
+
+                        <Grid item xs={12} sm={0.4} sx={{ display: { xs: 'none', sm: 'block' } }}>
+                            <Box
+                                className='vertical-line'
+                                sx={{
+                                    // borderLeft: '1px solid black',
+                                    height: '100%',
+                                    ml: 1.5
+                                }}
+                            ></Box>
+                        </Grid>
+
+                        <Grid xs={12} sm={5.8}>
+                            <Box
+                                sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', flexDirection: 'column' }}
+                            >
+                                {/* Upload Zone */}
+                                <Box
+                                    {...getRootProps()} // Spread dropzone props here
+                                    sx={{
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        border: '2px dashed #ccc',
+                                        padding: '20px',
+                                        width: '100%',
+                                        maxWidth: '500px',
+                                        textAlign: 'center',
+                                        cursor: 'pointer',
+                                    }}
+                                >
+                                    <input
+                                        id="file-input"
+                                        {...getInputProps()} // Spread input props here
+                                        onChange={handleFileChange} // Ensure to handle file changes
+                                        accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,image/jpeg,image/png"
+                                        style={{ display: 'none' }} // Hide the default file input
+                                        multiple // Enable multiple file selection
+                                    />
+                                    <Typography variant="h6">Drag & drop file here</Typography>
+                                    <Typography variant="body2">or</Typography>
+                                    <Button variant="contained" color="primary" onClick={handleButtonClick}>
+                                        Browse Files
+                                    </Button>
+                                    <Typography variant="body2" sx={{ marginTop: '8px' }}>
+                                        20 MB file size limit. Supported file types: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG.
+                                    </Typography>
+                                </Box>
+
+                                {/* Selected Files Display */}
+                                {selectedFiles.length > 0 && (
+                                    <Box mt={2} width="100%" maxWidth="500px">
+                                        <Typography variant="h6">Attached documents</Typography>
+                                        <div className="attachments-container">
+                                            {selectedFiles.map((file, index) => (
+                                                <Box
+                                                    key={index}
+                                                    sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', borderBottom: '1px solid #e0e0e0' }}
+                                                >
+                                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                        {/* File Icon */}
+                                                        <InsertDriveFileIcon sx={{ color: 'rgb(235, 88, 88)', marginRight: '8px' }} />
+
+                                                        {/* File Name */}
+                                                        <Typography
+                                                            variant="body1"
+                                                            sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '200px' }}
+                                                        >
+                                                            {file.name}
+                                                        </Typography>
+                                                    </Box>
+
+                                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                        {/* File Size */}
+                                                        <Typography variant="body2" sx={{ marginRight: '16px' }}>
+                                                            {Math.round(file.size / 1024)} KB
+                                                        </Typography>
+
+                                                        {/* Remove Button */}
+                                                        <IconButton onClick={() => handleRemoveFile(index)} sx={{ backgroundColor: '#f5f5f5' }} size="small">
+                                                            <DeleteIcon sx={{ color: 'gray' }} />
+                                                        </IconButton>
+                                                    </Box>
+                                                </Box>
+                                            ))}
+                                        </div>
+                                    </Box>
+                                )}
+                            </Box>
+                        </Grid>
+
+                    </Grid>
+                </>
             )}
         </Container>
     );

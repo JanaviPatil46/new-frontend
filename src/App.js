@@ -64,14 +64,14 @@ import InvoiceTempUpdate from './Templates/InvoicesTemp/InvoiceTempUpdate.js';
 import ChatTempUpdate from './Templates/ChatsTemp/ChatTempUpdate.js';
 import ServicesUpdate from './Pages/ServiceUpdate.js';
 import PreviewOrganizer from './Templates/OrganizersTemp/PreviewOranizer.js'
-
+import Adminsignup from './Admin-login-signup/adminSignup.js'
 const App = () => {
   return (
 
     <BrowserRouter>
 
       <Routes>
-
+      <Route path='/signup' element={<Adminsignup/>}/>
         <Route path='/' element={<SidebarComponent />}>
           <Route index element={<Insights />} />
           <Route path='/docs' element={<Docs/>}/>
