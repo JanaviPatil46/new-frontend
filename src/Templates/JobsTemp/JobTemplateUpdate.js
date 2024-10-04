@@ -6,7 +6,7 @@ import {
   Container,
 
   Grid,
-
+  IconButton,
   Autocomplete,
   TextField,
   InputLabel,
@@ -25,6 +25,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 dayjs.extend(customParseFormat);
 
@@ -292,6 +293,7 @@ const JobTemplateUpdate = () => {
     setStartsInDurationNew(tempvalues.startsinduration);
     setDueInDurationNew(tempvalues.dueinduration);
     setAbsoluteDateNew(tempvalues.absolutedates);
+    setComments(tempvalues.comments || []);
   };
 
 
@@ -316,7 +318,6 @@ const JobTemplateUpdate = () => {
 
   const updatejobtemp = () => {
 
-
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -332,11 +333,12 @@ const JobTemplateUpdate = () => {
       startsinduration: StartsInDurationNew,
       duein: DueInNew,
       dueinduration: DueInDurationNew,
-      comments: "",
+      comments: comments,
       startdate: StartsDateNew,
       enddate: DueDateNew,
     });
 
+    // console.log(raw)
     const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
@@ -362,7 +364,7 @@ const JobTemplateUpdate = () => {
         toast.error("Failed to create Job Template");
       });
   };
-  const updatesavejobtemp= () => {
+  const updatesavejobtemp = () => {
 
 
     const myHeaders = new Headers();
@@ -380,11 +382,11 @@ const JobTemplateUpdate = () => {
       startsinduration: StartsInDurationNew,
       duein: DueInNew,
       dueinduration: DueInDurationNew,
-      comments: "",
+      comments: comments,
       startdate: StartsDateNew,
       enddate: DueDateNew,
     });
-
+    // console.log(raw)
     const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
@@ -401,7 +403,7 @@ const JobTemplateUpdate = () => {
       })
       .then((result) => {
         toast.success("Job Template updated successfully");
-       
+
       })
       .catch((error) => {
         // Handle errors
@@ -439,7 +441,25 @@ const JobTemplateUpdate = () => {
       navigate("/firmtemp/templates/jobs");
     }
   };
-  
+
+
+  const [comments, setComments] = useState([]);
+
+  const addCommentField = () => {
+    setComments([...comments, '']); // Add a new empty comment field
+  };
+  console.log(comments)
+  const handleCommentChange = (index, value) => {
+    const updatedComments = [...comments];
+    updatedComments[index] = value; // Update the specific comment field
+    setComments(updatedComments);
+  };
+  const deleteCommentField = (index) => {
+    const updatedComments = comments.filter((_, i) => i !== index); // Remove the comment at the specified index
+    setComments(updatedComments);
+  };
+
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Container>
@@ -450,10 +470,13 @@ const JobTemplateUpdate = () => {
 
           }}
         >
-          <Typography variant="h6" gutterBottom>
-            Edit Job Template
-          </Typography>
-
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography variant="h6" gutterBottom>
+              Edit Job Template
+            </Typography>
+            <Button onClick={addCommentField}>Add comments</Button>
+          </Box>
+          <Box ><hr /></Box>
           <Grid container spacing={2} >
             <Grid xs={12} sm={5.8} ml={2} >
               <Box mt={2}>
@@ -703,14 +726,39 @@ const JobTemplateUpdate = () => {
 
             </Grid>
 
+           
+            <Grid xs={12} sm={5.8} mt={3}>
+              <Box
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}
+              >
+                {/* <EditCalendarRoundedIcon sx={{ fontSize: '120px', color: '#c6c7c7', }} /> */}
+                <Box style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
 
+                  {comments.map((comment, index) => (
+                    <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <TextField
+                        value={comment}
+                        onChange={(e) => handleCommentChange(index, e.target.value)}
+                        placeholder={`Comment ${index + 1}`}
+                        variant="outlined"
+                        fullWidth
+                        multiline
+                      />
+                      <IconButton onClick={() => deleteCommentField(index)} >
+                        <DeleteIcon />
+                      </IconButton>
+                    </div>
+                  ))}
+                </Box>
+              </Box>
+            </Grid>
 
 
           </Grid>
           <Box mt={3}><hr /></Box>
 
           <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-          <Button variant="contained" color="primary" onClick={updatejobtemp}>Save & exit</Button>
+            <Button variant="contained" color="primary" onClick={updatejobtemp}>Save & exit</Button>
             <Button variant="contained" color="primary" onClick={updatesavejobtemp}>Save</Button>
             <Button variant="outlined" onClick={handleJobTempCancle}>Cancel</Button>
           </Box>

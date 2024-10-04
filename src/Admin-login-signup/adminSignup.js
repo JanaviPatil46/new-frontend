@@ -20,12 +20,13 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 const AdminSignup = () => {
     
-
+    const navigate = useNavigate();
     // TODO ======== #page control logic No1 =======
     //! Change state for testing
-    const [currentStep, setCurrentStep] = useState(1);
+    const [currentStep, setCurrentStep] = useState(3);
     const [phoneNumber, setPhoneNumber] = useState("");
     const [valid, setValid] = useState(true);
     const nextStep = () => {
@@ -675,7 +676,7 @@ const AdminSignup = () => {
     
           //call final
           adminalldata();
-          // useNavigate("/login")
+          navigate("/login")
         //   history("/login");
         }
       };
@@ -878,23 +879,15 @@ console.log(raw)
                                 </Box>
 
                             </Box>
-                            <Box
-                                sx={{
-                                    height: '100vh',
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    backgroundColor: '#f0f0f0',
+                            <Box sx={{backgroundColor: '#f0f0f0',height: '89vh',display:'flex',alignItems:'center',justifyContent:'center'}}> 
 
-                                }}
-                            >
-                                <Paper elevation={3} sx={{ padding: 4, width: '500px', textAlign: 'center', borderRadius: '10px' }}>
+                            <Paper elevation={3} sx={{ padding: 4, width: '500px', textAlign: 'center', borderRadius: '10px' }}>
                                     <Typography variant="h4" component="h2" gutterBottom>
                                         Confirmation Code
                                     </Typography>
 
                                     <Typography sx={{ margin: '3px 0' }}>
-                                        We sent a confirmation code to your email:
+                                        We sent a confirmation code to your email: <b>{inpval.email}</b>
                                     </Typography>
 
                                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 2 }}>
@@ -943,7 +936,74 @@ console.log(raw)
                                         </Button>
                                     </Box>
                                 </Paper>
+
                             </Box>
+                            {/* <Box
+                                sx={{
+                                    height: '100vh',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    backgroundColor: '#f0f0f0',
+
+                                }}
+                            >
+                                <Paper elevation={3} sx={{ padding: 4, width: '500px', textAlign: 'center', borderRadius: '10px' }}>
+                                    <Typography variant="h4" component="h2" gutterBottom>
+                                        Confirmation Code
+                                    </Typography>
+
+                                    <Typography sx={{ margin: '3px 0' }}>
+                                        We sent a confirmation code to your email: <b>{inpval.email}</b>
+                                    </Typography>
+
+                                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 2 }}>
+                                        <BorderColorIcon />
+                                    </Box>
+
+                                    <Typography sx={{ fontSize: '14px', margin: '3px 0' }}>
+                                        Please, enter it below:
+                                    </Typography>
+
+                                    <Box sx={{ mt: 2, mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <OtpInput
+                                            value={otp}
+                                            onChange={setOtp}
+                                            numInputs={6}
+                                            renderInput={(props) => (
+                                                <input
+                                                    {...props}
+                                                    style={{
+                                                        width: '40px',
+                                                        height: '60px',
+                                                        fontSize: '42px',
+                                                        fontFamily: 'Arial, sans-serif',
+                                                        margin: '10px',
+                                                        textAlign: 'center',
+
+                                                    }}
+                                                />
+                                            )}
+                                        />
+                                    </Box>
+
+                                    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 4 }}>
+                                        <Typography variant="body"> <strong>Didn't receive it? </strong></Typography>
+                                        <Button variant="contained" className="btn1" onClick={resensotp}>
+                                            Resend code
+                                        </Button>
+                                    </Box>
+
+                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '40px' }}>
+                                        <Button variant="contained" className="btn1" onClick={handleClearOtp}>
+                                            Clear OTP
+                                        </Button>
+                                        <Button variant="contained" className="btn1" onClick={sendOtpVerify}>
+                                            Verify
+                                        </Button>
+                                    </Box>
+                                </Paper>
+                            </Box> */}
 
                         </Box>
                     </>
@@ -970,9 +1030,12 @@ console.log(raw)
                                 </Box>  */}
                             </Box>
                         </Box>
+                         
+
+
                         <Box
                             backgroundColor={'#f0f0f0'}
-                            height={'100vh'}
+                            height={'89vh'}
                             display="flex"
                             alignItems="center"
                             justifyContent="center"

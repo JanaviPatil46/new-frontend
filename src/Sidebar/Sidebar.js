@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useContext  } from "react";
 import { Box, IconButton, List, ListItem, ListItemIcon, ListItemText, Collapse, Typography, Drawer, Button } from "@mui/material";
 import { ChevronLeft, ChevronRight, Brightness4, Brightness7 } from "@mui/icons-material";
 import ExpandLess from '@mui/icons-material/ExpandLess';
@@ -13,10 +13,16 @@ import { FaBars  } from "react-icons/fa6";
 // import { AiOutlinePlusCircle } from "react-icons/ai";
 import { FaPlusCircle } from "react-icons/fa";
 import { RxCross2 } from "react-icons/rx";
+import { useNavigate } from "react-router-dom";
 import ContactForm from '../Contact/ContactForm';
 import AccountForm from '../Contact/AccountForm';
+import Cookies from "js-cookie";
+import { toast } from "react-toastify";
+import { AiOutlineLogout } from "react-icons/ai";
+import { LoginContext } from '../Sidebar/Context/Context'
+import user from "../Images/user.jpg";
 function Sidebar() {
-
+  const navigate = useNavigate();
   const SIDEBAR_API = process.env.REACT_APP_SIDEBAR_URL;
   const NEW_SIDEBAR_API = process.env.REACT_APP_SIDEBAR_URL;
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -114,6 +120,121 @@ function Sidebar() {
   useEffect(() => {
     document.body.className = theme;
   }, [theme]);
+
+
+   //Logout
+   const { logindata, setLoginData } = useContext(LoginContext);
+
+   const history = useNavigate();
+ 
+   const logoutuser = async () => {
+     let token = localStorage.getItem("usersdatatoken");
+     const url = "http://127.0.0.1:8880/common/login/logout/";
+ 
+     const requestOptions = {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json",
+         Authorization: token,
+       },
+     };
+ 
+     const res = await fetch(url, requestOptions);
+ 
+     const data = await res.json();
+ 
+     if (data.status === 200) {
+       console.log("user logout");
+       localStorage.removeItem("usersdatatoken");
+       Cookies.remove("userToken");
+       setLoginData(false);
+ 
+       history("/login");
+     } else {
+       console.log("error");
+     }
+   };
+   const [data, setData] = useState(false);
+  const [loginsData, setloginsData] = useState("");
+
+
+
+  const DashboardValid = async () => {
+    let token = localStorage.getItem("usersdatatoken");
+    // Cookies.set("userToken", res.result.token); // Set cookie with duration provided
+    // console.log(token);
+    const url = "http://127.0.0.1:8880/common/login/verifytoken/";
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+      },
+    });
+
+    //console.log(token);
+
+    const data = await res.json();
+    //console.log(data);
+    if (data.message === "Invalid token") {
+      // console.log("error page");
+      navigate("/login");
+    } else {
+      // console.log("user verify");
+      setLoginData(data);
+      setloginsData(data.user.id);
+      if (data.user.role === "Admin") {
+        fetchUserData(data.user.id);
+        navigate("/");
+      } else if (data.user.role === "Client") {
+        navigate("/clientDash/home");
+      } else if (data.user.role === "TeamMember") {
+        fetchUserData(data.user.id);
+        navigate("/");
+      } else {
+        toast.error("You are not valid user.");
+        setTimeout(() => {
+          navigate("/login");
+        }, 1000);
+      }
+    }
+  };
+  useEffect(() => {
+    DashboardValid();
+    setData(true);
+  }, []);
+
+  const [userData, setUserData] = useState("");
+  const [username, setUsername] = useState("");
+
+  const fetchUserData = async (id) => {
+    const maxLength = 15;
+    const myHeaders = new Headers();
+
+    const requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+    const url = `http://127.0.0.1:8880/common/user/${id}`;
+    fetch(url + loginsData, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        // console.log("id", result);
+        if (result.email) {
+          setUserData(truncateString(result.email, maxLength)); // Set a maximum length for userData if email exists
+        }
+        // console.log(userData)
+        setUsername(result.username);
+      });
+  };
+  const truncateString = (str, maxLength) => {
+    if (str && str.length > maxLength) {
+      return str.substring(0, maxLength) + "..."; // Truncate string if it exceeds maxLength
+    } else {
+      return str;
+    }
+  };
   return (
     <div className="grid-container">
       <header className="header" >
@@ -220,6 +341,35 @@ function Sidebar() {
                 </Box>
               ))}
             </List>
+            <div className="bottom-content">
+              <ul>
+                <li>
+                  <Link to="#" className="logout-link">
+                    <div className="info" >
+                      <div>
+                        <img src={user} alt="user" className="user-icon" style={{ height: "50px", width: "50px" }} />
+                      </div>
+                      <span className="hidden-text" >
+                        <b>{username}</b>
+                        <h6>{userData}</h6>
+                      </span>
+
+                      <div>
+                      <AiOutlineLogout  
+                        className="logout-icon"
+                        onClick={() => {
+                          logoutuser();
+                        }}
+                      />
+                    </div>
+                    </div>
+
+                 
+                  </Link>
+                </li>
+               
+              </ul>
+            </div>
           </Box>
         </Box>
       </aside>

@@ -7,9 +7,10 @@ import './App.css'
 import reportWebVitals from './reportWebVitals';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import Context from './Sidebar/Context/Context'
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
+  <Context>
   <React.StrictMode>
     
     
@@ -17,6 +18,7 @@ root.render(
     <ToastContainer />
    
   </React.StrictMode>
+  </Context>
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -14,8 +14,9 @@ import {
   ListItem,
   ListItemText,
   Popover,
-  IconButton
+  IconButton,
 } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Grid from '@mui/material/Unstable_Grid2';
 import Priority from '../Priority/Priority';
 import EditorShortcodes from '../Texteditor/EditorShortcodes';
@@ -220,7 +221,7 @@ const JobTemp = () => {
     }
   }, [selectedOption]);
   const handleCloseDropdown = () => {
-      setShowDropdown(false);
+    setShowDropdown(false);
     setAnchorEl(null);
   };
   const handlejobName = (e) => {
@@ -290,7 +291,6 @@ const JobTemp = () => {
     setDueDate(null);
   }
 
-
   const createjobtemp = () => {
     if (absoluteDate === true) {
       if (!validateForm()) {
@@ -308,7 +308,7 @@ const JobTemp = () => {
         priority: priority.value,
         description: description,
         absolutedates: absoluteDate,
-        comments: "",
+        comments: comments,
         startdate: startDate,
         enddate: dueDate,
       });
@@ -359,7 +359,7 @@ const JobTemp = () => {
         startsinduration: startsInDuration,
         duein: duein,
         dueinduration: dueinduration,
-        comments: "",
+        comments: comments,
       });
 
       const requestOptions = {
@@ -409,7 +409,7 @@ const JobTemp = () => {
         priority: priority.value,
         description: description,
         absolutedates: absoluteDate,
-        comments: "",
+        comments: comments,
         startdate: startDate,
         enddate: dueDate,
       });
@@ -431,8 +431,8 @@ const JobTemp = () => {
         .then((result) => {
           // Handle success
           toast.success("Job Template created successfully");
-       
-        
+
+
           fetchJobTemplatesData();
         })
         .catch((error) => {
@@ -460,7 +460,7 @@ const JobTemp = () => {
         startsinduration: startsInDuration,
         duein: duein,
         dueinduration: dueinduration,
-        comments: "",
+        comments: comments,
       });
 
       const requestOptions = {
@@ -480,8 +480,8 @@ const JobTemp = () => {
         .then((result) => {
           // Handle success
           toast.success("Job Template created successfully");
-         
-         
+
+
           fetchJobTemplatesData();
           // Additional logic after successful creation if needed
         })
@@ -502,31 +502,31 @@ const JobTemp = () => {
   const handleDelete = (_id) => {
     // Show a confirmation prompt
     const isConfirmed = window.confirm("Are you sure you want to delete this Job template?");
-        
+
     // Proceed with deletion if confirmed
     if (isConfirmed) {
-    const requestOptions = {
-      method: "DELETE",
-      redirect: "follow",
-    };
-    const url = `${JOBS_API}/workflow/jobtemplate/jobtemplate/`;
-    fetch(url + _id, requestOptions)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to delete item");
-        }
-        return response.json();
-      })
-      .then((result) => {
-        console.log(result);
-        toast.success("Item deleted successfully");
-        setShowForm(false);
-        fetchJobTemplatesData();
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error("Failed to delete item");
-      });
+      const requestOptions = {
+        method: "DELETE",
+        redirect: "follow",
+      };
+      const url = `${JOBS_API}/workflow/jobtemplate/jobtemplate/`;
+      fetch(url + _id, requestOptions)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to delete item");
+          }
+          return response.json();
+        })
+        .then((result) => {
+          console.log(result);
+          toast.success("Item deleted successfully");
+          setShowForm(false);
+          fetchJobTemplatesData();
+        })
+        .catch((error) => {
+          console.error(error);
+          toast.error("Failed to delete item");
+        });
     }
 
   };
@@ -595,22 +595,35 @@ const JobTemp = () => {
     },
   });
   const [errors, setErrors] = useState({});
- 
+
  
   const validateForm = () => {
     let tempErrors = {};
     let isValid = true;
     if (!templatename) tempErrors.templatename = "Template name is required";
     if (!jobName) tempErrors.jobName = "Job name is required";
-    
-
-
-    
 
     setErrors(tempErrors);
     // return isValid;
     return Object.keys(tempErrors).length === 0;
   };
+
+  const [comments, setComments] = useState([]);
+
+  const addCommentField = () => {
+    setComments([...comments, '']); // Add a new empty comment field
+  };
+  console.log(comments)
+  const handleCommentChange = (index, value) => {
+    const updatedComments = [...comments];
+    updatedComments[index] = value; // Update the specific comment field
+    setComments(updatedComments);
+  };
+  const deleteCommentField = (index) => {
+    const updatedComments = comments.filter((_, i) => i !== index); // Remove the comment at the specified index
+    setComments(updatedComments);
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Container>
@@ -625,14 +638,16 @@ const JobTemp = () => {
           </Box>
         ) : (
           <Box
-            sx={{
-              mt: 2,
-
-            }}
+            sx={{ mt: 2, }}
           >
-            <Typography variant="h6" gutterBottom>
-              Create Job Template
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Typography variant="h6" gutterBottom>
+                Create Job Template
+              </Typography>
+              <Button onClick={addCommentField}>Add comments</Button>
+            </Box>
+
+
             <Box ><hr /></Box>
             <Grid container spacing={2} >
               <Grid xs={12} sm={5.8} >
@@ -761,9 +776,9 @@ const JobTemp = () => {
                     )}
                     renderInput={(params) => (
                       <>
-                        <TextField {...params} 
+                        <TextField {...params}
                           variant="outlined" placeholder="Assignees" />
-                       
+
                       </>
                     )}
                     isOptionEqualToValue={(option, value) => option.value === value.value}
@@ -830,9 +845,9 @@ const JobTemp = () => {
                           value={startsin}
                           sx={{ background: "#fff", width: '100%' }}
                           onChange={(e) => setstartsin(e.target.value)}
-                         
+
                         />
-                       
+
                       </Grid>
                       <Grid item xs={12} sm={5}>
                         <Autocomplete
@@ -848,7 +863,7 @@ const JobTemp = () => {
                                 sx={{ backgroundColor: "#fff" }}
 
                               />
-                            
+
                             </>
                           )}
                           value={dayOptions.find((option) => option.value === startsInDuration) || null}
@@ -866,11 +881,11 @@ const JobTemp = () => {
                           placeholder='0'
                           value={duein}
                           fullWidth
-                          
+
                           sx={{ background: '#fff', }}
                           onChange={(e) => setduein(e.target.value)}
                         />
-                        
+
                       </Grid>
                       <Grid item xs={12} sm={5}>
                         <Autocomplete
@@ -881,7 +896,7 @@ const JobTemp = () => {
                           renderInput={(params) => (
                             <>
                               <TextField {...params} variant="outlined" sx={{ backgroundColor: '#fff' }} />
-                             
+
                             </>
                           )}
                           value={dayOptions.find((option) => option.value === dueinduration) || null}
@@ -906,7 +921,25 @@ const JobTemp = () => {
                 <Box
                   style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}
                 >
-                  <EditCalendarRoundedIcon sx={{ fontSize: '120px', color: '#c6c7c7', }} />
+                  {/* <EditCalendarRoundedIcon sx={{ fontSize: '120px', color: '#c6c7c7', }} /> */}
+                  <Box style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                   
+                    {comments.map((comment, index) => (
+                      <div key={index} style={{ display: 'flex',alignItems: 'center', gap: '8px' }}>
+                        <TextField
+                          value={comment}
+                          onChange={(e) => handleCommentChange(index, e.target.value)}
+                          placeholder={`Comment ${index + 1}`}
+                          variant="outlined"
+                          fullWidth
+                          multiline
+                        />
+                        <IconButton onClick={() => deleteCommentField(index)} >
+                          <DeleteIcon />
+                        </IconButton>
+                      </div>
+                    ))}
+                  </Box>
                 </Box>
               </Grid>
 
@@ -915,7 +948,7 @@ const JobTemp = () => {
             <Box mt={3}><hr /></Box>
 
             <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-            <Button variant="contained" color="primary" onClick={createjobtemp}>Save & exit</Button>
+              <Button variant="contained" color="primary" onClick={createjobtemp}>Save & exit</Button>
               <Button variant="contained" color="primary" onClick={createsavejobtemp}>Save</Button>
               <Button variant="outlined" onClick={handleCloseJobTemp}>Cancel</Button>
             </Box>

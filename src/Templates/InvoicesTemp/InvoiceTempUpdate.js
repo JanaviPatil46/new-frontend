@@ -954,11 +954,27 @@ const[numOfReminder,setnumOfReminder]=useState();
                               {rows.map((row, index) => (
                                 <TableRow key={index}>
                                   <TableCell sx={{ position: 'sticky', left: 0, backgroundColor: 'white', zIndex: 1 }}>
-                                    <CreatableSelect
+                                    {/* <CreatableSelect
                                       placeholder="Product or Service"
                                       options={serviceoptions}
                                       value={row.productName ? serviceoptions.find(option => option.label === row.productName) || { label: row.productName, value: row.productName } : null}
                                       onChange={(selectedOption) => handleServiceChange(index, selectedOption)}
+                                      isClearable
+                                      styles={{
+                                        container: (provided) => ({ ...provided, width: '180px' }),
+                                        control: (provided) => ({ ...provided, width: '180px' }),
+                                        menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
+                                      }}
+                                      menuPortalTarget={document.body}
+                                    /> */}
+                                     <CreatableSelect
+                                      // placeholder='Product or Service'
+                                      placeholder={row.isDiscount ? 'Reason for discount' : 'Product or Service'}
+                                      options={serviceoptions}
+                                      // value={serviceoptions.find(option => option.label === row.productName) || { label: row.productName, value: row.productName }}
+                                      value={row.productName ? serviceoptions.find(option => option.label === row.productName) || { label: row.productName, value: row.productName } : null}
+                                      onChange={(selectedOption) => handleServiceChange(index, selectedOption)}
+                                      onInputChange={(inputValue, actionMeta) => handleServiceInputChange(inputValue, actionMeta, index)}
                                       isClearable
                                       styles={{
                                         container: (provided) => ({ ...provided, width: '180px' }),

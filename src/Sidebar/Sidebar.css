@@ -150,6 +150,62 @@ border-bottom: 1px solid grey;
   border-bottom-left-radius: 15px;
   
 }
+.bottom-content ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+
+}
+.bottom-content {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+ 
+ 
+ 
+}
+.bottom-content .info{
+display: flex;
+align-items: center;
+gap: 5px;
+}
+
+.logout-link{
+  text-decoration: none;
+  color: black;
+}
+
+.logout-icon {
+  font-size: 25px;
+  margin-left: 25px;
+  color: #2c85de;
+}
+
+.hidden-text b, 
+.hidden-text h6 {
+  margin: 0;
+  padding: 0;
+
+}
+.collapsed .hidden-text b, .collapsed .hidden-text h6{
+  display: none;
+}
+.collapsed .user-icon{
+  display: none;
+}
+.collapsed .logout-icon{
+  margin-left: 4px;
+}
+.hidden-text b, 
+.hidden-text h6 {
+  text-decoration: none;
+  margin: 0;
+  padding: 0;
+  transition: color 0.3s ease;
+}
+/* .collapsed .logout-link{
+  flex-direction: column;
+} */
 
 @media (max-width: 768px) {
   .sidebar {
