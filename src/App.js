@@ -64,18 +64,22 @@ import InvoiceTempUpdate from './Templates/InvoicesTemp/InvoiceTempUpdate.js';
 import ChatTempUpdate from './Templates/ChatsTemp/ChatTempUpdate.js';
 import ServicesUpdate from './Pages/ServiceUpdate.js';
 import PreviewOrganizer from './Templates/OrganizersTemp/PreviewOranizer.js'
-import Adminsignup from './Admin-login-signup/adminSignup.js'
-import AdminLogin from './Admin-login-signup/adminLogin.js'
+// import Adminsignup from './Admin-login-signup/adminSignup.js'
+// import AdminLogin from './Admin-login-signup/adminLogin.js'
 import  ForgotPassword from './Admin-login-signup/Forgotpassword.js';
 import  ResetPassword from './Admin-login-signup/ResetPassword.js';
+import Adminsignup from './Admin-login-signup/newsignup.js'
+import AdminLogin from './Admin-login-signup/Login';
 const App = () => {
   return (
 
     <BrowserRouter>
 
       <Routes>
-        <Route path='/signup' element={<Adminsignup />} />
+        {/* <Route path='/signup' element={<Adminsignup />} /> */}
         <Route path='/login' element={<AdminLogin/>}/>
+        <Route  path='/signup' element={<Adminsignup/>}/>
+        {/* <Route path='/newlogin' element={<AdminLogin/>}/> */}
         <Route path="/forgotpass" element={<ForgotPassword />} />
         <Route path="/resetpassword/:id/:token" element={<ResetPassword />} />
         <Route path='/' element={<SidebarComponent />}>
