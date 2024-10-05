@@ -20,6 +20,11 @@ import android from '../Images/android.png';
 import apple from '../Images/apple.png';
 import { Link } from 'react-router-dom'
 const Login = () => {
+
+
+
+
+    const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
     const history = useNavigate();
     const [inpval, setInpval] = useState({
         email: "",
@@ -71,7 +76,7 @@ const Login = () => {
         try {
 
 
-            const url = "http://127.0.0.1:8880/common/login/generatetoken/";
+            const url = `${LOGIN_API}/common/login/generatetoken/`;
             const data = await fetch(url, {
                 method: "POST",
                 headers: {

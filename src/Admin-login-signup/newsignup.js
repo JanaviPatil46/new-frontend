@@ -20,7 +20,7 @@ import logo from "../Images/logoAdmin.png";
 import { Link, Divider, IconButton, Typography, TextField, InputLabel, Checkbox, FormHelperText, Button, FormControlLabel, Paper, Grid, FormControl, Slider, Input } from '@mui/material';
 const MyForm = () => {
 
-
+    const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
     const navigate = useNavigate();
     const handleAdminLogin =()=>{
         navigate('/login')
@@ -173,7 +173,8 @@ const MyForm = () => {
                 email: inpval.email,
                 otp: otp,
             });
-            const Url = 'http://127.0.0.1:8880/verify-otp/';
+            
+            const Url = `${LOGIN_API}/verify-otp/`;
             let config = {
                 method: "post",
                 maxBodyLength: Infinity,
@@ -212,7 +213,7 @@ const MyForm = () => {
         let data = JSON.stringify({
             email: inpval.email,
         });
-        const Url = "http://127.0.0.1:8880/request-otp";
+        const Url = `${LOGIN_API}/request-otp`;
         let config = {
             method: "post",
             maxBodyLength: Infinity,
@@ -312,7 +313,7 @@ const MyForm = () => {
                 redirect: "follow",
             };
 
-            fetch("http://127.0.0.1:8880/common/user/email/getuserbyemail/" + email, requestOptions)
+            fetch(`${LOGIN_API}/common/user/email/getuserbyemail/` + email, requestOptions)
                 .then((response) => {
                     if (!response.ok) {
                         throw new Error("Network response was not ok");
@@ -335,7 +336,7 @@ const MyForm = () => {
                         let config = {
                             method: "post",
                             maxBodyLength: Infinity,
-                            url: "http://127.0.0.1:8880/request-otp",
+                            url: `${LOGIN_API}/request-otp`,
                             headers: {
                                 "Content-Type": "application/json",
                             },
@@ -669,7 +670,7 @@ const MyForm = () => {
             body: raw,
             redirect: "follow",
         };
-        const Url = 'http://127.0.0.1:8880/admin/adminsignup';
+        const Url = `${LOGIN_API}/admin/adminsignup`;
         fetch(Url, requestOptions)
             .then((response) => {
                 if (!response.ok) {
@@ -695,7 +696,7 @@ const MyForm = () => {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         const port = window.location.port;
-        const url = `http://127.0.0.1:8880:${port}/login`;
+        const url = `${LOGIN_API}:${port}/login`;
         const raw = JSON.stringify({
             email: inpval.email,
             url: url,
@@ -707,7 +708,7 @@ const MyForm = () => {
             body: raw,
             redirect: "follow",
         };
-        const Url = 'http://127.0.0.1:8880/usersavedemail/';
+        const Url = `${LOGIN_API}/usersavedemail/`;
         fetch(Url, requestOptions)
             .then((response) => response.text())
 
@@ -734,7 +735,7 @@ const MyForm = () => {
             body: raw,
             redirect: "follow",
         };
-        const Url = 'http://127.0.0.1:8880/common/login/signup/';
+        const Url = `${LOGIN_API}/common/login/signup/`;
         fetch(Url, requestOptions)
             .then((response) => response.text())
 

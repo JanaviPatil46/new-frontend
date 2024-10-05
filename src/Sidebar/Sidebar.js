@@ -23,6 +23,7 @@ import { LoginContext } from '../Sidebar/Context/Context'
 import user from "../Images/user.jpg";
 function Sidebar() {
   const navigate = useNavigate();
+  const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
   const SIDEBAR_API = process.env.REACT_APP_SIDEBAR_URL;
   const NEW_SIDEBAR_API = process.env.REACT_APP_SIDEBAR_URL;
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -129,7 +130,7 @@ function Sidebar() {
  
    const logoutuser = async () => {
      let token = localStorage.getItem("usersdatatoken");
-     const url = "http://127.0.0.1:8880/common/login/logout/";
+     const url = `${LOGIN_API}/common/login/logout/`;
  
      const requestOptions = {
        method: "POST",
@@ -163,7 +164,7 @@ function Sidebar() {
     let token = localStorage.getItem("usersdatatoken");
     // Cookies.set("userToken", res.result.token); // Set cookie with duration provided
     // console.log(token);
-    const url = "http://127.0.0.1:8880/common/login/verifytoken/";
+    const url = `${LOGIN_API}/common/login/verifytoken/`;
     const res = await fetch(url, {
       method: "GET",
       headers: {
@@ -216,7 +217,7 @@ function Sidebar() {
       headers: myHeaders,
       redirect: "follow",
     };
-    const url = `http://127.0.0.1:8880/common/user/${id}`;
+    const url = `${LOGIN_API}/common/user/${id}`;
     fetch(url + loginsData, requestOptions)
       .then((response) => response.json())
       .then((result) => {
