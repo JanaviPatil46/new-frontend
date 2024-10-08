@@ -22,10 +22,10 @@ import { Link } from 'react-router-dom'
 const Login = () => {
 
 
-
+    const navigate = useNavigate();
 
     const LOGIN_API = process.env.REACT_APP_USER_LOGIN;
-    const history = useNavigate();
+    // const history = useNavigate();
     const [inpval, setInpval] = useState({
         email: "",
         password: "",
@@ -95,7 +95,7 @@ const Login = () => {
             if (res.status === 200) {
                 localStorage.setItem("usersdatatoken", res.result.token);
                 Cookies.set("userToken", res.result.token);
-                history("/");
+                navigate("/");
                 setInpval({ ...inpval, email: "", password: "" });
 
                 Cookies.set("userToken", res.result.token);
@@ -122,10 +122,10 @@ const Login = () => {
     return (
         <Grid
             container
-            sx={{
-                height: '100vh',
+            // sx={{
+            //     height: '100vh',
 
-            }}
+            // }}
         >
             <Grid
                 item
@@ -137,11 +137,11 @@ const Login = () => {
 
 
                 <Box className='logininfo' >
-                    <Box mt={2} className="login-logo" >
+                    <Box  className="login-logo" >
                         <img src={logo} alt="" style={{ height: "95px", }} />
                     </Box>
                    
-                    <h1 className='wbtext'  >Welcome Back</h1>
+                    <Typography variant='h3' className='wbtext'  >Welcome Back</Typography>
                     <Typography variant='p' sx={{ color: "white", mx: 8, textAlign: 'center', fontSize: '20px', fontWeight: '500' }}>
                         "Welcome to 'SNP Tax & Financials', where tax management meets simplicity. Our advanced software streamlines tax processes for individuals, businesses, and professionals, ensuring accuracy and efficiency. Experience a new era of financial ease with SNP Tax & Financials."</Typography>
                     <Typography variant='p' className='fontchange' >

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Box,
   Button,
@@ -10,7 +10,7 @@ import {
   Switch, FormControlLabel,
   Divider, IconButton,
   useMediaQuery,
-  useTheme, Alert
+  useTheme, Alert, Drawer
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { RiDeleteBin6Line } from "react-icons/ri";
@@ -22,6 +22,58 @@ import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 import { CiMenuKebab } from "react-icons/ci";
 import { useNavigate } from 'react-router-dom';
 const PipelineTemp = () => {
+
+
+
+  const [openDropdownIndex, setOpenDropdownIndex] = useState(null); // Store index of open dropdown
+  const [selectedAutomation, setSelectedAutomation] = useState(null);
+  const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const dropdownRefs = useRef([]); // Reference for each dropdown
+
+  // Toggle dropdown visibility for a specific stage
+  const handleAutomationClick = (index) => {
+    setOpenDropdownIndex(openDropdownIndex === index ? null : index); // Toggle dropdown for the selected index
+  };
+
+  // Handle option selection for a stage
+  const handleAutomationSelect = (option) => {
+    setSelectedAutomation(option);
+    setDrawerOpen(true); // Open the drawer
+    setOpenDropdownIndex(null); // Close the dropdown
+  };
+
+  // Close the drawer
+  const handleDrawerClose = () => {
+    setDrawerOpen(false); // Close the drawer
+  };
+
+  // Detect clicks outside the dropdown and close it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const isClickInside = dropdownRefs.current.some(
+        (ref) => ref && ref.contains(event.target)
+      );
+      if (!isClickInside) {
+        setOpenDropdownIndex(null); // Close the open dropdown if the click is outside any dropdown
+      }
+    };
+
+    // Attach event listener on the document
+    document.addEventListener('mousedown', handleClickOutside);
+
+    // Cleanup event listener when component unmounts
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownRefs]);
+
+  const handleSave = () => {
+    // Logic to save automation data
+    console.log("Automation data saved: ", selectedAutomation);
+
+    // Close the drawer after saving
+    handleDrawerClose();
+  };
 
   const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
   const JOBS_API = process.env.REACT_APP_JOBS_TEMP_URL;
@@ -236,7 +288,7 @@ const PipelineTemp = () => {
         // Additional error handling here
       });
   };
-  const createSavePipe= () => {
+  const createSavePipe = () => {
     if (!validateForm()) {
       return; // Prevent form submission if validation fails
     }
@@ -273,7 +325,7 @@ const PipelineTemp = () => {
         // Display success toast
         fetchPipelineData();
         toast.success("Pipeline created successfully");
-       
+
         // Additional success handling here
       })
       .catch((error) => {
@@ -338,26 +390,26 @@ const PipelineTemp = () => {
 
     // Show a confirmation prompt
     const isConfirmed = window.confirm("Are you sure you want to delete this pipeline?");
-        
+
     // Proceed with deletion if confirmed
     if (isConfirmed) {
-    const config = {
-      method: 'delete',
-      maxBodyLength: Infinity,
-      url: `${PIPELINE_API}/workflow/pipeline/pipeline/${_id}`,
-      headers: {}
-    };
+      const config = {
+        method: 'delete',
+        maxBodyLength: Infinity,
+        url: `${PIPELINE_API}/workflow/pipeline/pipeline/${_id}`,
+        headers: {}
+      };
 
-    try {
-      const response = await axios.request(config);
-      console.log('Delete response:', response.data);
-      toast.success('Item deleted successfully');
-      fetchPipelineData();
-      // Optionally, you can refresh the data or update the state to reflect the deletion
-    } catch (error) {
-      console.error('Error deleting pipeline:', error);
+      try {
+        const response = await axios.request(config);
+        console.log('Delete response:', response.data);
+        toast.success('Item deleted successfully');
+        fetchPipelineData();
+        // Optionally, you can refresh the data or update the state to reflect the deletion
+      } catch (error) {
+        console.error('Error deleting pipeline:', error);
+      }
     }
-  }
   };
 
   const [tempIdget, setTempIdGet] = useState("");
@@ -668,7 +720,7 @@ const PipelineTemp = () => {
                               variant="outlined"
                               size="small"
                             />
-                             {(!!templateError) && <Alert sx={{
+                            {(!!templateError) && <Alert sx={{
                               width: '96%',
                               p: '0', // Adjust padding to control the size
                               pl: '4%', height: '23px',
@@ -893,14 +945,57 @@ const PipelineTemp = () => {
                             )}
                             {index > 0 && index !== stages.length - 1 && (
                               <Box sx={{ marginTop: '10px' }}>
-                                <Typography variant="body2" sx={{ cursor: 'pointer', color: 'blue', fontWeight: 'bold' }}>Add conditions</Typography>
+                                <Typography variant="body2" sx={{ cursor: 'pointer', color: 'blue', fontWeight: 'bold' }}  >Add conditions</Typography>
+
+
                               </Box>
                             )}
+
                             <Typography variant="h6" sx={{ fontSize: '15px', fontWeight: 'bold', mt: 2 }}>Automations</Typography>
                             <Typography variant="body2">Triggered when job enters stage</Typography>
-                            <Typography variant="body2" sx={{ cursor: 'pointer', color: 'blue', fontWeight: 'bold', mt: 2 }}>Added automation</Typography>
+                            <Typography variant="body2" sx={{ cursor: 'pointer', color: 'blue', fontWeight: 'bold', mt: 2 }} onClick={() => handleAutomationClick(index)}>Added automation</Typography>
                             <Typography variant="h6" sx={{ fontSize: '15px', mt: 2, fontWeight: 'bold' }}>Automove</Typography>
                             <Typography variant="body2">Move jobs automatically when linked actions are completed</Typography>
+
+
+                            {/* {isDropdownOpen && (
+                              <Box ref={dropdownRef} sx={{ border: '1px solid #ccc', borderRadius: '5px', padding: '10px', marginTop: '10px', }} className='automove-dropdown'>
+                                {['Apply folder template', 'Update account tags', 'Send invoice', 'Create organizer', 'Create task',
+                                  'Send proposal/EL', 'Send email', 'Send message', 'Update account access', 'Update job assignees', 'Add wiki page']
+                                  .map(option => (
+                                    <Typography
+                                      key={option}
+                                      variant="body2"
+                                      sx={{ cursor: 'pointer', padding: '5px 0' }}
+                                      onClick={() => handleAutomationSelect(option)}
+                                    >
+                                      {option}
+                                    </Typography>
+                                  ))}
+                              </Box>
+                            )} */}
+                            {openDropdownIndex === index && (
+                              <Box
+                                ref={(el) => (dropdownRefs.current[index] = el)} // Assign ref to the specific dropdown
+                                sx={{ border: '1px solid #ccc', borderRadius: '5px', padding: '10px', marginTop: '10px' }}
+                                className='automove-dropdown'
+                              >
+                                {[
+                                  'Apply folder template', 'Update account tags', 'Send invoice', 'Create organizer', 'Create task',
+                                  'Send proposal/EL', 'Send email', 'Send message', 'Update account access', 'Update job assignees', 'Add wiki page'
+                                ].map(option => (
+                                  <Typography
+                                    key={option}
+                                    variant="body2"
+                                    sx={{ cursor: 'pointer', padding: '5px 0' }}
+                                    onClick={() => handleAutomationSelect(option)}
+                                  >
+                                    {option}
+                                  </Typography>
+                                ))}
+                              </Box>
+                            )}
+
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
                               <Switch
                                 onChange={() => handleAutoMoveChange(index)}
@@ -929,12 +1024,30 @@ const PipelineTemp = () => {
                 </Box>
 
                 <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-                <Button variant="contained" color="primary" onClick={createPipe}>Save & exit</Button>
+                  <Button variant="contained" color="primary" onClick={createPipe}>Save & exit</Button>
                   <Button variant="contained" color="primary" onClick={createSavePipe}>Save</Button>
                   <Button variant="outlined" onClick={handleClosePipelineTemp}>Cancel</Button>
                 </Box>
               </Box>
             </form>
+            <Drawer
+              anchor="right"
+              open={isDrawerOpen}
+              onClose={handleDrawerClose}
+            >
+              <Box sx={{ width: 500, padding: 2 }}>
+                <Typography variant="h6">Automation: {selectedAutomation}</Typography>
+                {/* Render relevant form here based on selectedAutomation */}
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                <Button variant="outlined" onClick={handleDrawerClose} sx={{ mr: 1 }}>
+                  Cancel
+                </Button>
+                <Button variant="contained" color="primary" onClick={handleSave}>
+                  Save
+                </Button>
+              </Box>
+            </Drawer>
           </Box>
         </Box>
       )}

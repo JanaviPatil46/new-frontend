@@ -40,6 +40,7 @@ import { useNavigate } from 'react-router-dom';
 import { CiMenuKebab } from "react-icons/ci";
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import CreatableSelect from 'react-select/creatable';
+import Editor from '../Texteditor/Editor'
 const InvoiceTemp = () => {
 
   const INVOICE_API = process.env.REACT_APP_INVOICE_TEMP_URL
@@ -49,6 +50,10 @@ const InvoiceTemp = () => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const [showForm, setShowForm] = useState(false);
+  const [clientNote, setClientNote] = useState('');
+  const handleEditorChange = (content) => {
+    setClientNote(content);
+  };
   const handleCreateInvoiceTemp = () => {
     setShowForm(true);
   };
@@ -271,6 +276,7 @@ const InvoiceTemp = () => {
         taxTotal: taxTotal,
         total: totalAmount
       },
+      clientNote: clientNote,
       active: "true",
     });
 
@@ -334,6 +340,7 @@ const InvoiceTemp = () => {
         taxTotal: taxTotal,
         total: totalAmount
       },
+      clientNote: clientNote,
       active: "true",
     });
 
@@ -396,9 +403,9 @@ const InvoiceTemp = () => {
   const lineItems = rows.map(item => ({
     productorService: item.productName, // Assuming productName maps to productorService
     description: item.description,
-    rate: item.rate.replace('$', ''), // Removing '$' sign from rate
+    rate: item.rate, // Removing '$' sign from rate
     quantity: item.qty,
-    amount: item.amount.replace('$', ''), // Removing '$' sign from amount
+    amount: item.amount, // Removing '$' sign from amount
     tax: item.tax.toString() // Converting boolean to string
   }))
   const [totalAmount, setTotalAmount] = useState(0);
@@ -1281,7 +1288,10 @@ const InvoiceTemp = () => {
                       </Box> */}
 
 
-
+                      <Box sx={{ mb: 10, mt: 2 }}>
+                        <Typography variant="h6" mb={1}>Note to client</Typography>
+                        <Editor onChange={handleEditorChange} initialContent={clientNote} />
+                      </Box>
 
 
 

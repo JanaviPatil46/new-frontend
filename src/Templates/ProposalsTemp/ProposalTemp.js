@@ -10,9 +10,9 @@ import {
   TextField,
   FormControl,
   FormControlLabel,
- 
+
   Switch,
- 
+
   List,
   ListItem,
   ListItemText,
@@ -50,12 +50,14 @@ const MyStepper = () => {
     Introduction: true,
     Terms: true,
     ServicesInvoices: true,
+    Payments: false,
   });
 
   const steps = ['General'].concat(
     stepsVisibility.Introduction ? ['Introduction'] : [],
     stepsVisibility.Terms ? ['Terms'] : [],
-    stepsVisibility.ServicesInvoices ? ['Services & Invoices'] : []
+    stepsVisibility.ServicesInvoices ? ['Services & Invoices'] : [],
+     activeOption === 'invoice' ? ['Payments'] : [] 
   );
 
   const handleNext = () => {
@@ -382,7 +384,7 @@ const MyStepper = () => {
                 size='small'
                 margin='normal'
                 fullWidth
-sx={{backgroundColor:'#fff'}}
+                sx={{ backgroundColor: '#fff' }}
               />
             </Box>
             <Box sx={{ width: '100%', marginTop: '30px' }}>
@@ -393,7 +395,7 @@ sx={{backgroundColor:'#fff'}}
 
                     <Autocomplete
                       multiple
-                      sx={{ mt: 2,backgroundColor:'#fff' }}
+                      sx={{ mt: 2, backgroundColor: '#fff' }}
                       options={options}
                       size='small'
                       getOptionLabel={(option) => option.label}
@@ -414,7 +416,7 @@ sx={{backgroundColor:'#fff'}}
                       value={proposalName + selectedShortcut} onChange={handleProposalName}
                       placeholder="Proposal name (visible to clients)"
                       size="small"
-                      sx={{ mt: 2,backgroundColor:'#fff' }}
+                      sx={{ mt: 2, backgroundColor: '#fff' }}
 
                     />
                     <Box>
@@ -518,7 +520,7 @@ sx={{backgroundColor:'#fff'}}
                 fullWidth
                 margin="normal"
                 placeholder="Introduction"
-                sx={{backgroundColor:'#fff'}}
+                sx={{ backgroundColor: '#fff' }}
               />
             </Box>
             <Editor
@@ -539,7 +541,7 @@ sx={{backgroundColor:'#fff'}}
                 fullWidth
                 margin="normal"
                 placeholder="Engagement letter"
-                sx={{backgroundColor:'#fff'}}
+                sx={{ backgroundColor: '#fff' }}
               />
             </Box>
             <TermEditor
@@ -563,6 +565,7 @@ sx={{backgroundColor:'#fff'}}
                 marginTop: '15px',
                 backgroundColor: activeOption === 'invoice' ? 'rgba(90, 165, 230, 0.5)' : 'transparent',
                 boxShadow: activeOption === 'invoice' ? '0 0 10px rgba(0, 0, 0, 0.1)' : 'none',
+                fontWeight:'bold'
               }}
               onClick={handleShowInvoiceForm}
             >
@@ -581,6 +584,7 @@ sx={{backgroundColor:'#fff'}}
                 marginTop: '15px',
                 backgroundColor: activeOption === 'service' ? 'rgba(90, 165, 230, 0.5)' : 'transparent',
                 boxShadow: activeOption === 'service' ? '0 0 10px rgba(0, 0, 0, 0.1)' : 'none',
+                fontWeight:'bold'
               }}
               onClick={handleShowServiceForm}
             >
@@ -591,13 +595,16 @@ sx={{backgroundColor:'#fff'}}
             </Typography>
 
             {/* Render the forms conditionally based on activeOption state */}
+            <Box mt={3}>
             {activeOption === 'invoice' && (
               <Box>
 
                 {/* <Typography>Invoice Form</Typography> */}
-                <Invoice/>
+                <Invoice />
               </Box>
             )}
+            </Box>
+           
 
             {activeOption === 'service' && (
               <Box>
@@ -611,7 +618,7 @@ sx={{backgroundColor:'#fff'}}
                     </Typography>
                   </Box>
 
-                  <Table sx={{ width: '100%',backgroundColor:'#fff' }}>
+                  <Table sx={{ width: '100%', backgroundColor: '#fff' }}>
                     <TableHead>
                       <TableRow>
                         <TableCell >PRODUCT OR SERVICE</TableCell>
@@ -676,7 +683,7 @@ sx={{backgroundColor:'#fff'}}
 
                   <div className='one-time-summary' style={{ marginTop: '20px' }}>
                     <Typography variant="h6">Summary</Typography>
-                    <Table sx={{backgroundColor:'#fff'}}>
+                    <Table sx={{ backgroundColor: '#fff' }}>
                       <TableHead>
                         <TableRow>
                           <TableCell>SUBTOTAL</TableCell>
@@ -710,33 +717,67 @@ sx={{backgroundColor:'#fff'}}
                     </Table>
                   </div>
                 </div>
-               
+
 
               </Box>
             )}
           </Box>
         );
+        case steps.indexOf('Payments'):
+      return (
+        <Box>
+          <Typography variant="h6">Payment Information</Typography>
+          <Box mt={1} mb={3}>
+            <TextField
+              size="small"
+              fullWidth
+              margin="normal"
+              placeholder="Payment terms"
+              sx={{ backgroundColor: '#fff' }}
+            />
+          </Box>
+          <Box mt={1} mb={3}>
+            <TextField
+              size="small"
+              fullWidth
+              margin="normal"
+              placeholder="Payment due date"
+              sx={{ backgroundColor: '#fff' }}
+            />
+          </Box>
+          <Box mt={1} mb={3}>
+            <TextField
+              size="small"
+              fullWidth
+              margin="normal"
+              placeholder="Payment amount"
+              sx={{ backgroundColor: '#fff' }}
+            />
+          </Box>
+          {/* Add more fields for payment details if necessary */}
+        </Box>
+      );
       default:
         return <Typography>Unknown Step</Typography>;
     }
   };
- 
+
   return (
     <Box sx={{ width: '100%' }}>
       {showStepper ? (
         <Box>
           <Grid container spacing={3} mr={5} p={5}>
             <Grid item xs={8} >
-              <Box sx={{p:2,backgroundColor:'#fff'}}>
-              <Stepper  activeStep={activeStep}  >
-                {steps.map((label, index) => (
-                  <Step key={index} onClick={() => handleStepClick(index)} >
-                    <StepLabel style={{ cursor: 'pointer',}} >{label}</StepLabel>
-                  </Step>
-                ))}
-              </Stepper>
+              <Box sx={{ p: 2, backgroundColor: '#fff' }}>
+                <Stepper activeStep={activeStep}  >
+                  {steps.map((label, index) => (
+                    <Step key={index} onClick={() => handleStepClick(index)} >
+                      <StepLabel style={{ cursor: 'pointer', }} >{label}</StepLabel>
+                    </Step>
+                  ))}
+                </Stepper>
               </Box>
-              
+
             </Grid>
             <Grid
               item
