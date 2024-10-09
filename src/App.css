@@ -69,3 +69,28 @@
   width: 200px; /* Match the width of the parent element */
 
 }
+.automove-dropdown li{
+  list-style: none;
+  cursor: pointer;
+  margin-top: 5px;
+  margin-left: 8px;
+}
+.automove-dropdown2 {
+  /* position: absolute; */
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  top:280px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  /* margin-top: 5px; */
+  z-index: 1; /* Ensure the dropdown appears above other elements */
+  max-height: 200px; /* Limit the height */
+  overflow-y: auto; /* Enable scrolling */
+  width: 200px; /* Match the width of the parent element */
+
+}
+.automove-dropdown2 li{
+  cursor: pointer;
+  margin-top: 5px;
+  margin-left: 8px;
+}

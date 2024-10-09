@@ -441,11 +441,47 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
   ];
 
 
-  const renderOptions = (element) => {
+  // const renderOptions = (element) => {
+  //   return (
+  //     <Box>
+  //       {element.options && element.options.map(option => (
+  //         <Box key={option.id} sx={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+  //           <TextField
+  //             variant="outlined"
+  //             placeholder="Option"
+  //             value={option.text}
+  //             size='small'
+  //             margin='normal'
+  //             fullWidth
+  //             className='organizer-input-label'
+  //             onChange={(e) => handleOptionChange(element.id, option.id, e.target.value)}
+
+  //           />
+  //           <IconButton onClick={() => handleDeleteOption(element.id, option.id)}>
+  //             <RiDeleteBinLine />
+  //           </IconButton>
+  //         </Box>
+  //       ))}
+  //       <Button variant="contained" onClick={() => handleAddOption(element.id)}>
+  //         Add Option
+  //       </Button>
+  //     </Box>
+  //   );
+  // };
+
+  const renderOptions = (element, type = 'text') => {
     return (
       <Box>
-        {element.options && element.options.map(option => (
+        {element.options && element.options.map((option) => (
           <Box key={option.id} sx={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+           {type === 'radio' ? (
+            <Input type="radio" name={`radio-${element.id}`} sx={{ marginRight: '8px' }} />
+          ) : type === 'checkbox' ? (
+            <Input type="checkbox" name={`checkbox-${element.id}`} sx={{ marginRight: '8px' }} />
+          ) : type === 'Yes/No' ? (
+            <Input type="radio" name={`radio-${element.id}`} sx={{ marginRight: '8px' }} />
+          ) : null}
+  
             <TextField
               variant="outlined"
               placeholder="Option"
@@ -455,7 +491,6 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
               fullWidth
               className='organizer-input-label'
               onChange={(e) => handleOptionChange(element.id, option.id, e.target.value)}
-
             />
             <IconButton onClick={() => handleDeleteOption(element.id, option.id)}>
               <RiDeleteBinLine />
@@ -468,8 +503,7 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
       </Box>
     );
   };
-
-
+  
   const renderFormElement = (element) => {
     switch (element.type) {
       case 'Free Entry':
@@ -582,7 +616,7 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
           <Box key={element.id} sx={{ marginBottom: '8px' }}>
             <Typography>Radio Button:</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Input type="radio" name={`radio-${element.id}`} sx={{ marginRight: '4px' }} />
+             
               <TextField
                 variant="outlined"
                 placeholder="Radio Buttons"
@@ -601,7 +635,8 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
                 <RiDeleteBinLine />
               </IconButton>
             </Box>
-            {renderOptions(element)}
+            
+            {renderOptions(element, 'radio')}
           </Box>
         );
       case 'Checkboxes':
@@ -609,7 +644,7 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
           <Box key={element.id} sx={{ marginBottom: '8px' }}>
             <Typography>Checkbox:</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Input type="checkbox" name={`checkbox-${element.id}`} sx={{ marginRight: '4px' }} />
+              {/* <Input type="checkbox" name={`checkbox-${element.id}`} sx={{ marginRight: '4px' }} /> */}
               <TextField
                 variant="outlined"
                 placeholder="Checkboxes"
@@ -628,7 +663,8 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
                 <RiDeleteBinLine />
               </IconButton>
             </Box>
-            {renderOptions(element)}
+            {/* {renderOptions(element)} */}
+            {renderOptions(element, 'checkbox')}
           </Box>
         );
       case 'Dropdown':
@@ -681,7 +717,7 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
                 <RiDeleteBinLine />
               </IconButton>
             </Box>
-            {renderOptions(element)}
+            {renderOptions(element,'Yes/No')}
           </Box>
         );
 
