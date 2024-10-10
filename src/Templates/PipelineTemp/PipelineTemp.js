@@ -10,7 +10,7 @@ import {
   Switch, FormControlLabel,
   Divider, IconButton,
   useMediaQuery,
-  useTheme, Alert, Drawer, List, Checkbox, Chip,ListItem,ListItemText
+  useTheme, Alert, Drawer, List, Checkbox, Chip, ListItem, ListItemText
 } from '@mui/material';
 import makeAnimated from 'react-select/animated';
 import { AiOutlineSearch } from "react-icons/ai";
@@ -301,7 +301,11 @@ const PipelineTemp = () => {
   const [stages, setStages] = useState([]);
 
   const handleAddStage = () => {
-    const newStage = { name: '', conditions: [], automations: [], autoMove: false, showDropdown: false, activeAction: null };
+    const newStage = {
+      name: '', conditions: [], automations: [
+        { conditions: [], templates: '',action:'', }
+      ], autoMove: false, showDropdown: false, activeAction: null
+    };
     setStages([...stages, newStage]);
   };
   const handleStageNameChange = (e, index) => {
@@ -383,6 +387,8 @@ const PipelineTemp = () => {
     if (!validateForm()) {
       return; // Prevent form submission if validation fails
     }
+    console.log(stages)
+
     const data = {
       pipelineName: pipelineName,
       availableto: combinedValues,
@@ -400,7 +406,7 @@ const PipelineTemp = () => {
       stages: stages,
 
     };
-
+    console.log(data)
     const config = {
       method: 'post',
       maxBodyLength: Infinity,
@@ -955,7 +961,7 @@ const PipelineTemp = () => {
   //   console.log(`Saving automations for stage ${index}:`, updatedAutomations);
   // };
 
-  const handleSaveAutomations = (index) => {
+  const handleSaveAutomations = (stageIndex) => {
     // Construct saved automations specific to the current stage
     const savedAutomations = items.map((item) => {
       const automationData = {
@@ -978,52 +984,60 @@ const PipelineTemp = () => {
 
     handleFormClose();
 
-    
+    setStages((prevStages) => {
+      const updatedStages = [...prevStages];
+      updatedStages[stageIndex] = {
+        ...updatedStages[stageIndex],
+        automations: savedAutomations,  // Update the automations field for the stage
+      };
+
+      return updatedStages;
+    });
     setAutomations((prevAutomations) => {
       const updatedAutomations = [...prevAutomations];
-      updatedAutomations[index] = savedAutomations; // Save the automations for the specific stage
-     
+      updatedAutomations[stageIndex] = savedAutomations; // Save the automations for the specific stage
+
       return updatedAutomations; // Return the updated automations
     });
 
-    console.log('Saved Automations for Stage', index, ':', savedAutomations);
+    console.log('Saved Automations for Stage', stageIndex, ':', savedAutomations);
   };
   const renderAutomationsForStage = (index) => {
     const automationsForStage = automations[index] || []; // Get automations for the specific stage
     return (
       <Box>
-        
+
         <List>
           {automationsForStage.map((automation) => (
-            
+
             <Paper elevation={3} sx={{ borderRadius: '10px' }}>
-                                  <li key={automation.id} style={{ textAlign: 'left', listStyle: 'none', padding: '15px', marginTop: 10, borderRadius: '5px', }}>
-                                    <Box sx={{ fontWeight: 'bold' }}>{automation.id}.
-                                      {automation.action}</Box>
+              <li key={automation.id} style={{ textAlign: 'left', listStyle: 'none', padding: '15px', marginTop: 10, borderRadius: '5px', }}>
+                <Box sx={{ fontWeight: 'bold' }}>{automation.id}.
+                  {automation.action}</Box>
 
-                                    {automation.templates.label} <br />
-                                    <Typography sx={{ fontWeight: 'bold' }}>Conditions</Typography>
+                {automation.templates.label} <br />
+                <Typography sx={{ fontWeight: 'bold' }}>Conditions</Typography>
 
-                                    {automation.conditions.map((condition) => (
-                                      <Box key={condition._id} >
-                                        <span style={{
-                                          backgroundColor: condition.tagColour, borderRadius: '20px',
-                                          color: '#fff',
-                                          fontSize: '12px',
-                                          fontWeight: '600',
-                                          textAlign: 'center',
-                                          padding: '3px', display: 'inline-block',
-                                          width: `${calculateWidth(condition.tagName)}px`,
+                {automation.conditions.map((condition) => (
+                  <Box key={condition._id} >
+                    <span style={{
+                      backgroundColor: condition.tagColour, borderRadius: '20px',
+                      color: '#fff',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      textAlign: 'center',
+                      padding: '3px', display: 'inline-block',
+                      width: `${calculateWidth(condition.tagName)}px`,
 
-                                        }}>
+                    }}>
 
-                                          {condition.tagName}
-                                        </span>
-                                      </Box>
-                                    ))}
+                      {condition.tagName}
+                    </span>
+                  </Box>
+                ))}
 
-                                  </li>
-                                </Paper>
+              </li>
+            </Paper>
           ))}
         </List>
       </Box>
@@ -1455,7 +1469,7 @@ const PipelineTemp = () => {
                             <Box>
 
 
-                            {renderAutomationsForStage(index)}
+                              {renderAutomationsForStage(index)}
 
                             </Box>
 
