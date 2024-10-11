@@ -999,6 +999,24 @@ const PipelineTemp = () => {
 
       return updatedAutomations; // Return the updated automations
     });
+    // setStages((prevStages) => {
+    //   const updatedStages = [...prevStages];
+    //   const existingAutomations = updatedStages[stageIndex].automations || []; // Get existing automations
+    //   updatedStages[stageIndex] = {
+    //     ...updatedStages[stageIndex],
+    //     automations: [...existingAutomations, ...savedAutomations],  // Merge new automations with existing ones
+    //   };
+  
+    //   return updatedStages;
+    // });
+  
+    // setAutomations((prevAutomations) => {
+    //   const updatedAutomations = [...prevAutomations];
+    //   const existingAutomations = updatedAutomations[stageIndex] || []; // Get existing automations
+    //   updatedAutomations[stageIndex] = [...existingAutomations, ...savedAutomations]; // Merge new automations
+  
+    //   return updatedAutomations;
+    // });
 
     console.log('Saved Automations for Stage', stageIndex, ':', savedAutomations);
   };

@@ -277,7 +277,7 @@ function Sidebar() {
             )}
           </Box>
           <Box className='sidebar-contents' sx={{ mt: 2 }}>
-            <List sx={{ cursor: 'pointer' }}>
+            <List sx={{ cursor: 'pointer', }} className='menu-list-name'>
               {sidebarItems.map(item => (
                 <Box key={item._id}>
                   <ListItem onClick={() => handleToggleSubmenu(item._id, item.label)} component={Link} to={item.path} className="menu-item" sx={{

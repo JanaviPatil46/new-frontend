@@ -12,8 +12,7 @@ import {
   Switch, FormControlLabel,
   Divider, IconButton,
   useMediaQuery,
-  useTheme,
-  Drawer, List
+  useTheme, Drawer, List
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { RiDeleteBin6Line } from "react-icons/ri";
@@ -21,12 +20,11 @@ import { LuPlusCircle, LuPenLine } from "react-icons/lu";
 import { RxDragHandleDots2 } from "react-icons/rx";
 import { toast } from 'react-toastify';
 import { useNavigate, useParams } from "react-router-dom";
-import makeAnimated from 'react-select/animated';
 import { RxCross2 } from "react-icons/rx";
 import SendEmail from './Automations/SendEmail'
+import makeAnimated from 'react-select/animated';
 import SendInvoice from './Automations/SendInvoice';
 const PipelineTempUpdate = () => {
-
 
   const INVOICE_API = process.env.REACT_APP_INVOICE_TEMP_URL
   const EMAIL_API = process.env.REACT_APP_EMAIL_TEMP_URL;
@@ -149,7 +147,7 @@ const PipelineTempUpdate = () => {
     }
   };
 
-  const calculateWidth = (label) => Math.min(label.length * 8, 200);
+  // const calculateWidth = (label) => Math.min(label.length * 8, 200);
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -177,7 +175,7 @@ const PipelineTempUpdate = () => {
         marginBottom: '5px',
         marginRight: '5px',
         display: 'inline-block',
-        width: `${calculateWidth(tag.tagName)}px`,
+        // width: `${calculateWidth(tag.tagName)}px`,
       }}
     >
       {tag.tagName}
@@ -198,12 +196,16 @@ const PipelineTempUpdate = () => {
         marginBottom: '5px',
         marginRight: '5px',
         display: 'inline-block',
-        width: `${calculateWidth(tag.tagName)}px`,
+        // width: `${calculateWidth(tag.tagName)}px`,
       }}
     >
       {tag.tagName}
     </Box>
   ));
+
+
+
+
 
 
 
@@ -222,7 +224,7 @@ const PipelineTempUpdate = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-
+ 
 
   // sort jobs
   const [sortbyjobs, setSortbyJobs] = useState([]);
@@ -286,21 +288,27 @@ const PipelineTempUpdate = () => {
     setAssignees(event.target.checked);
   };
   const [stages, setStages] = useState([]);
-  const [newStageIndex, setNewStageIndex] = useState(null);
+  // const [newStageIndex, setNewStageIndex] = useState(null);
+  // const handleAddStage = () => {
+  //   const newIndex = stages.length;
+  //   const newStage = {
+  //     name: '', conditions: [], automations: [
+  //       { conditions: [], templates: '', action: '', }
+  //     ], autoMove: false, showDropdown: false, activeAction: null
+  //   };
+  //   setStages([...stages, newStage]);
+  //   setNewStageIndex(newIndex);
+  // };
   const handleAddStage = () => {
-    const newIndex = stages.length;
-    const newStage = {
-      name: '', conditions: [], automations: [
-        { conditions: [], templates: '', action: '', }
-      ], autoMove: false, showDropdown: false, activeAction: null
-    };
+    const newStage = { name: '', conditions: [], automations: [
+      { conditions: [], templates: '',action:'', }
+    ], autoMove: false, showDropdown: false, activeAction: null };
     setStages([...stages, newStage]);
-    setNewStageIndex(newIndex);
   };
   const handleStageNameChange = (e, index) => {
-    const newStages = [...stages];
-    newStages[index].name = e.target.value;
-    setStages(newStages);
+    const newStages = [...stages]; 
+    newStages[index].name = e.target.value; 
+    setStages(newStages); 
   };
 
   const handleDeleteStage = (index) => {
@@ -349,7 +357,7 @@ const PipelineTempUpdate = () => {
   const [selectedtemp, setselectedTemp] = useState(() => {
     return localStorage.getItem('selectedtemp') || null;
   });
-  const handletemp = async (event, selectedtemp) => {
+ const handletemp = async (event, selectedtemp) => {
     setselectedTemp(selectedtemp)
   }
   useEffect(() => {
@@ -371,7 +379,6 @@ const PipelineTempUpdate = () => {
     label: temp.templatename
 
   }));
-
 
   const [pipelineData, setPipelineData] = useState([]);
 
@@ -435,7 +442,7 @@ const PipelineTempUpdate = () => {
       })
       .then((result) => {
         toast.success("Pipeline Updated successfully");
-
+        
       })
       .catch((error) => {
         toast.error("Failed to Updated pipeline");
@@ -488,7 +495,6 @@ const PipelineTempUpdate = () => {
 
   //get all templateName Record
   const [stagesWithAutomations, setStagesWithAutomations] = useState([]);
-
   useEffect(() => {
     const fetchPipelineData = async () => {
       try {
@@ -504,18 +510,21 @@ const PipelineTempUpdate = () => {
         setStages(data.pipelineTemplate.stages);
 
 
-
-        // Extracting and setting automation data from stages
         if (data.pipelineTemplate && data.pipelineTemplate.stages) {
           const stagesWithAutomations = data.pipelineTemplate.stages.map((stage) => ({
             stageName: stage.name,
             automations: stage.automations.map((automation) => ({
               action: automation.action,
-              templateLabel: automation.templates.label,
-              templateValue: automation.templates.value,
               conditions: automation.conditions,
+              templates: automation.templates
+                ? { 
+                    label: automation.templates.label, 
+                    value: automation.templates.value 
+                  }
+                : null // Handle cases where templates is undefined
             })),
           }));
+        
           console.log("Stages with Automations:", stagesWithAutomations); // Log extracted stages and automations
           setStagesWithAutomations(stagesWithAutomations);
           // setAutomations(stagesWithAutomations); // Assuming you have a state variable for stages with automations
@@ -570,233 +579,213 @@ const PipelineTempUpdate = () => {
   }, []);
 
   const handleButtonClick = () => {
-
+ 
     updatePipe();
     navigate("/firmtemp/templates/pipelines")
   };
-  // const hanleCloseupdate = ()=>{
-  //   navigate("/firmtemp/templates/pipelines")
-  // }
+
   const [isFormFilled, setIsFormFilled] = useState(false);
   const hanleCloseupdate = () => {
-    if (isFormFilled) {
-      const confirmCancel = window.confirm("You have unsaved changes. Are you sure you want to cancel?");
-      if (confirmCancel) {
+      if (isFormFilled) {
+          const confirmCancel = window.confirm("You have unsaved changes. Are you sure you want to cancel?");
+          if (confirmCancel) {
+            navigate("/firmtemp/templates/pipelines")
+          }
+      } else {
         navigate("/firmtemp/templates/pipelines")
       }
-    } else {
-      navigate("/firmtemp/templates/pipelines")
-    }
   };
   useEffect(() => {
     // Check if form is filled
     const checkIfFormFilled = () => {
-      if (piplineName || selectedUser || selectedSortByJob || selectedtemp || Account_id || Days_on_stage || Account_tags || startDate || Name || Due_date || Description || Assignees || Priority || stages) {
-        setIsFormFilled(true);
-      } else {
-        setIsFormFilled(false);
-      }
+        if (piplineName ||  selectedUser || selectedSortByJob ||selectedtemp || Account_id || Days_on_stage || Account_tags || startDate || Name || Due_date || Description || Assignees || Priority || stages) {
+            setIsFormFilled(true);
+        } else {
+            setIsFormFilled(false);
+        }
     };
 
     checkIfFormFilled();
-  }, [piplineName, selectedUser, selectedSortByJob, selectedtemp, Account_id, Days_on_stage, Account_tags, startDate, Name, Due_date, Description, Assignees, Priority, stages]);
+}, [piplineName ,selectedUser ,selectedSortByJob,selectedtemp ,Account_id ,Days_on_stage,Account_tags,startDate,Name,Due_date,Description,Assignees,Priority,stages]);
 
 
 
 
 
-  // automations
-  const [activeAction, setActiveAction] = useState(null);
-  const [isAutoFormOpen, setAutoFormOpen] = useState(false);
-  // const [showAutoMoveDropdown, setShowAutoMoveDropdown] = useState(false);
-  const [showAutoMoveDropdown, setShowAutoMoveDropdown] = useState({});
-  const handleToggleAutoMoveDropdown = (index) => {
-    setShowAutoMoveDropdown((prev) => ({
-      ...prev,
-      [index]: !prev[index], // Toggle the dropdown for the selected stage
-    }));
-  };
-  const automoveActions = ['Apply folder template', 'Update account tags', 'Send invoice', 'Create organozer', 'Create task', 'Send proposal/EL', 'Send email', 'Send message', 'Update account access', 'Update job assignees', 'Add wiki page'];
-  const handleActionSelect = (action) => {
-    setActiveAction(action);
-    toggleForm();
-    const newItemNumber = items.length + 1;
-    const newItem = { id: newItemNumber, action };
-    setItems([...items, newItem]);
-    setShowAutoMovesDropdown(false);
-  };
-  const handleFormClose = () => {
-    setAutoFormOpen(false);
-    setActiveAction(null);
-    setItems([]);
-  };
+// automations
+const [activeAction, setActiveAction] = useState(null);
+const [isAutoFormOpen, setAutoFormOpen] = useState(false);
+// const [showAutoMoveDropdown, setShowAutoMoveDropdown] = useState(false);
+const [showAutoMoveDropdown, setShowAutoMoveDropdown] = useState({});
+const handleToggleAutoMoveDropdown = (index) => {
+  setShowAutoMoveDropdown((prev) => ({
+    ...prev,
+    [index]: !prev[index], // Toggle the dropdown for the selected stage
+  }));
+};
+const automoveActions = ['Apply folder template', 'Update account tags', 'Send invoice', 'Create organozer', 'Create task', 'Send proposal/EL', 'Send email', 'Send message', 'Update account access', 'Update job assignees', 'Add wiki page'];
+const handleActionSelect = (action) => {
+  setActiveAction(action);
+  toggleForm();
+  const newItemNumber = items.length + 1;
+  const newItem = { id: newItemNumber, action };
+  setItems([...items, newItem]);
+  setShowAutoMovesDropdown(false);
+};
+const handleFormClose = () => {
+  setAutoFormOpen(false);
+  setActiveAction(null);
+  setItems([]);
+};
 
 
 
 
 
-  const toggleForm = () => {
-    setAutoFormOpen(!isAutoFormOpen);
-    setShowAutoMoveDropdown(false);
-  };
+const toggleForm = () => {
+  setAutoFormOpen(!isAutoFormOpen);
+  setShowAutoMoveDropdown(false);
+};
 
 
 
 
-  const [items, setItems] = useState([]);
-  const [showAutoMovesDropdown, setShowAutoMovesDropdown] = useState(false);
-  const automoveActionsForm = [
-    'Apply folder template',
-    'Update account tags',
-    'Send invoice',
-    'Create organizer',
-    'Create task',
-    'Send proposal/EL',
-    'Send email',
-    'Send message',
-    'Update account access',
-    'Update job assignees',
-    'Add wiki page'
-  ];
-  const handleAddItems = (action) => {
-    const newItemNumber = items.length + 1;
-    const newItem = { id: newItemNumber, action };
-    setItems([...items, newItem]);
-    setShowAutoMovesDropdown(false);
+const [items, setItems] = useState([]);
+const [showAutoMovesDropdown, setShowAutoMovesDropdown] = useState(false);
+const automoveActionsForm = [
+  'Apply folder template',
+  'Update account tags',
+  'Send invoice',
+  'Create organizer',
+  'Create task',
+  'Send proposal/EL',
+  'Send email',
+  'Send message',
+  'Update account access',
+  'Update job assignees',
+  'Add wiki page'
+];
+const handleAddItems = (action) => {
+  const newItemNumber = items.length + 1;
+  const newItem = { id: newItemNumber, action };
+  setItems([...items, newItem]);
+  setShowAutoMovesDropdown(false);
 
-  };
-
-
+};
 
 
-  // Function to render content based on action
-  const renderActionContent = (action) => {
-    switch (action) {
-      case 'Send invoice':
-        return (
-          <>
 
-            <SendInvoice
-              isConditionsInvoiceFormOpen={isConditionsInvoiceFormOpen}
-              handleInvoiceGoBack={handleInvoiceGoBack}
-              handleInvoiceAddConditions={handleInvoiceAddConditions}
-              selectedInvoiceTags={selectedInvoiceTags}
-              selectedInvoiceTagElements={selectedInvoiceTagElements}
-              invoiceTemplateOptions={invoiceTemplateOptions}
-              selectedInvoiceTemplate={selectedInvoiceTemplate}
-              handleInvoiceTemplateChange={handleInvoiceTemplateChange}
-              tempSelectedInvoiceTags={tempSelectedInvoiceTags}
-              handleInvoiceCheckboxChange={handleInvoiceCheckboxChange}
-              filteredInvoiceTags={filteredInvoiceTags}
-              isAnyCheckboxInvoiceChecked={isAnyCheckboxInvoiceChecked}
-              handleInvoiceAddTags={handleInvoiceAddTags}
-              searchInvoiceTerm={searchInvoiceTerm}
-              handleInvoiceSearchChange={handleInvoiceSearchChange}
-            />
-          </>);
-      case 'Create organizer':
-        return (
-          <>
-            <Box ml={2}>Account tags updated</Box>
 
-          </>
-        );
-      case 'Send email':
-        return (
+// Function to render content based on action
+const renderActionContent = (action) => {
+  switch (action) {
+    case 'Send invoice':
+      return (
+        <>
 
-          <>
-            <SendEmail
-              isConditionsFormOpen={isConditionsFormOpen}
-              handleGoBack={handleGoBack}
-              handleAddConditions={handleAddConditions}
-              selectedTags={selectedTags}
-              selectedTagElements={selectedTagElements}
-              emailTemplateOptions={emailTemplateOptions}
-              selectedEmailTemplate={selectedEmailTemplate}
-              handleEmailTemplateChange={handleEmailTemplateChange}
-              tempSelectedTags={tempSelectedTags}
-              handleCheckboxChange={handleCheckboxChange}
-              filteredTags={filteredTags}
-              isAnyCheckboxChecked={isAnyCheckboxChecked}
-              handleAddTags={handleAddTags}
-              searchTerm={searchTerm}
-              handleSearchChange={handleSearchChange}
-            />
-          </>
-        );
-      // Add cases for other actions here
-      default:
-        return null;
+          <SendInvoice
+            isConditionsInvoiceFormOpen={isConditionsInvoiceFormOpen}
+            handleInvoiceGoBack={handleInvoiceGoBack}
+            handleInvoiceAddConditions={handleInvoiceAddConditions}
+            selectedInvoiceTags={selectedInvoiceTags}
+            selectedInvoiceTagElements={selectedInvoiceTagElements}
+            invoiceTemplateOptions={invoiceTemplateOptions}
+            selectedInvoiceTemplate={selectedInvoiceTemplate}
+            handleInvoiceTemplateChange={handleInvoiceTemplateChange}
+            tempSelectedInvoiceTags={tempSelectedInvoiceTags}
+            handleInvoiceCheckboxChange={handleInvoiceCheckboxChange}
+            filteredInvoiceTags={filteredInvoiceTags}
+            isAnyCheckboxInvoiceChecked={isAnyCheckboxInvoiceChecked}
+            handleInvoiceAddTags={handleInvoiceAddTags}
+            searchInvoiceTerm={searchInvoiceTerm}
+            handleInvoiceSearchChange={handleInvoiceSearchChange}
+          />
+        </>);
+    case 'Create organizer':
+      return (
+        <>
+          <Box ml={2}>Account tags updated</Box>
+
+        </>
+      );
+    case 'Send email':
+      return (
+        
+        <>
+          <SendEmail
+            isConditionsFormOpen={isConditionsFormOpen}
+            handleGoBack={handleGoBack}
+            handleAddConditions={handleAddConditions}
+            selectedTags={selectedTags}
+            selectedTagElements={selectedTagElements}
+            emailTemplateOptions={emailTemplateOptions}
+            selectedEmailTemplate={selectedEmailTemplate}
+            handleEmailTemplateChange={handleEmailTemplateChange}
+            tempSelectedTags={tempSelectedTags}
+            handleCheckboxChange={handleCheckboxChange}
+            filteredTags={filteredTags}
+            isAnyCheckboxChecked={isAnyCheckboxChecked}
+            handleAddTags={handleAddTags}
+            searchTerm={searchTerm}
+            handleSearchChange={handleSearchChange}
+          />
+        </>
+      );
+    // Add cases for other actions here
+    default:
+      return null;
+  }
+};
+const handleDeleteItems = (id) => {
+  // Filter out the folder with the given id
+  const updatedItems = items.filter(item => item.id !== id);
+  // Update the ids of remaining folders
+  const updatedItemsWithIds = updatedItems.map((item, index) => ({ ...item, id: index + 1 }));
+  setItems(updatedItemsWithIds);
+};
+// Function to render header content based on action
+
+
+const [automations, setAutomations] = useState([]);
+const [stageAutomations, setStageAutomations] = useState({});
+
+useEffect(() => {
+  // Initialize state for each stage
+  const initialAutomations = stages.reduce((acc, stage, index) => {
+    acc[index] = []; // Assuming each stage starts with no automations
+    return acc;
+  }, {});
+  setStageAutomations(initialAutomations);
+}, [stages]);
+
+const handleSaveAutomations = (index) => {
+  // Construct saved automations specific to the current stage
+  const savedAutomations = items.map((item) => {
+    const automationData = {
+      id: item.id,
+      action: item.action,
+    };
+
+    // Capture additional data for "Send Email" action
+    if (item.action === 'Send email') {
+      automationData.templates = selectedEmailTemplate; // Store selected template
+      automationData.conditions = selectedTags; // Store selected tags (conditions)
     }
-  };
-  const handleDeleteItems = (id) => {
-    // Filter out the folder with the given id
-    const updatedItems = items.filter(item => item.id !== id);
-    // Update the ids of remaining folders
-    const updatedItemsWithIds = updatedItems.map((item, index) => ({ ...item, id: index + 1 }));
-    setItems(updatedItemsWithIds);
-  };
-  // Function to render header content based on action
+    if (item.action === 'Send invoice') {
+      automationData.templates = selectedInvoiceTemplate; // Store selected template
+      automationData.conditions = selectedInvoiceTags; // Store selected tags (conditions)
+    }
 
+    return automationData;
+  });
 
-  const [automations, setAutomations] = useState([]);
+  handleFormClose();
 
-  const [stageAutomations, setStageAutomations] = useState({});
-
-  useEffect(() => {
-    // Initialize state for each stage
-    const initialAutomations = stages.reduce((acc, stage, index) => {
-      acc[index] = []; // Assuming each stage starts with no automations
-      return acc;
-    }, {});
-    setStageAutomations(initialAutomations);
-  }, [stages]);
-
-
-
-  const handleSaveAutomations = (stageIndex) => {
-    // Construct saved automations specific to the current stage
-    const savedAutomations = items.map((item) => {
-      const automationData = {
-        id: item.id,
-        action: item.action,
-      };
-
-      // Capture additional data for "Send Email" action
-      if (item.action === 'Send email') {
-        automationData.templates = selectedEmailTemplate; // Store selected template
-        automationData.conditions = selectedTags; // Store selected tags (conditions)
-      }
-      if (item.action === 'Send invoice') {
-        automationData.templates = selectedInvoiceTemplate; // Store selected template
-        automationData.conditions = selectedInvoiceTags; // Store selected tags (conditions)
-      }
-
-      return automationData;
-    });
-
-    handleFormClose();
-
-    // setStages((prevStages) => {
-    //   const updatedStages = [...prevStages];
-    //   updatedStages[stageIndex] = {
-    //     ...updatedStages[stageIndex],
-    //     automations: savedAutomations,  // Update the automations field for the stage
-    //   };
-
-    //   return updatedStages;
-    // });
-    // setAutomations((prevAutomations) => {
-    //   const updatedAutomations = [...prevAutomations];
-    //   updatedAutomations[stageIndex] = savedAutomations; // Save the automations for the specific stage
-
-    //   return updatedAutomations; // Return the updated automations
-    // });
-setStages((prevStages) => {
+  setStages((prevStages) => {
     const updatedStages = [...prevStages];
-    const existingAutomations = updatedStages[stageIndex].automations || []; // Get existing automations
-    updatedStages[stageIndex] = {
-      ...updatedStages[stageIndex],
+    const existingAutomations = updatedStages[index].automations || []; // Get existing automations
+    updatedStages[index] = {
+      ...updatedStages[index],
       automations: [...existingAutomations, ...savedAutomations],  // Merge new automations with existing ones
     };
 
@@ -805,176 +794,117 @@ setStages((prevStages) => {
 
   setAutomations((prevAutomations) => {
     const updatedAutomations = [...prevAutomations];
-    const existingAutomations = updatedAutomations[stageIndex] || []; // Get existing automations
-    updatedAutomations[stageIndex] = [...existingAutomations, ...savedAutomations]; // Merge new automations
+    const existingAutomations = updatedAutomations[index] || []; // Get existing automations
+    updatedAutomations[index] = [...existingAutomations, ...savedAutomations]; // Merge new automations
 
     return updatedAutomations;
   });
-    console.log('Saved Automations for Stage', stageIndex, ':', savedAutomations);
+  console.log('Saved Automations for Stage', index, ':', savedAutomations);
+};
+const renderAutomationsForStage = (index) => {
+  // Assume automations are stored as a nested array in the main data
+  const stage = stages[index]; // Get the specific stage based on index
+  const automationsForStage = stage?.automations || []; // Get automations for the specific stage
+
+
+  const findTagById = (tagId) => {
+
+    return tags.find((tag) => tag._id === tagId);
   };
+  return (
+    <Box>
+      <List>
+        {automationsForStage.map((automation, i) => (
+          <Paper elevation={3} sx={{ borderRadius: '10px' }} key={i}>
+            <li key={automation.id} style={{ textAlign: 'left', listStyle: 'none', padding: '15px', marginTop: 10, borderRadius: '5px' }}>
+              <Box sx={{ fontWeight: 'bold' }}>
+                {i + 1}. {automation.action}
+              </Box>
+
+              {automation.templates.label} <br />
 
 
 
-  const renderAutomationsForStage = (index) => {
-    // Assume automations are stored as a nested array in the main data
-    const stage = stages[index]; // Get the specific stage based on index
-    const automationsForStage = stage?.automations || []; // Get automations for the specific stage
 
-
-    const findTagById = (tagId) => {
-
-      return tags.find((tag) => tag._id === tagId);
-    };
-    return (
-      <Box>
-        <List>
-          {automationsForStage.map((automation, i) => (
-            <Paper elevation={3} sx={{ borderRadius: '10px' }} key={i}>
-              <li key={automation.id} style={{ textAlign: 'left', listStyle: 'none', padding: '15px', marginTop: 10, borderRadius: '5px' }}>
-                <Box sx={{ fontWeight: 'bold' }}>
-                  {i + 1}. {automation.action}
+              {automation.conditions.length > 0 && (
+                <Box>
+                  <Typography sx={{ fontWeight: 'bold' }}>Conditions</Typography>
+                  {automation.conditions.map((tagId) => {
+                    const matchedTag = findTagById(tagId); // Match each tagId with its data
+                    if (matchedTag) {
+                      return (
+                        <span
+                          key={tagId}
+                          style={{
+                            backgroundColor: matchedTag.tagColour,
+                            borderRadius: '20px',
+                            color: '#fff',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            textAlign: 'center',
+                            padding: '3px',
+                            display: 'inline-block',
+                            // width: `${calculateWidth(matchedTag.tagName)}px`,
+                            marginRight: '5px',
+                          }}
+                        >
+                          {matchedTag.tagName}
+                        </span>
+                      );
+                    }
+                    return null; // Return null instead of the message if matchedTag is not found
+                  })}
                 </Box>
+              )}
 
-                {automation.templates.label} <br />
+            </li>
+          </Paper>
+        ))}
+      </List>
+    </Box>
+  );
+};
+const renderNewAutomationsForStage = (index) => {
+  const automationsForStage = automations[index] || []; // Get automations for the specific stage
+  return (
+    <Box>
 
+      <List>
+        {automationsForStage.map((automation) => (
 
+          <Paper elevation={3} sx={{ borderRadius: '10px' }}>
+            <li key={automation.id} style={{ textAlign: 'left', listStyle: 'none', padding: '15px', marginTop: 10, borderRadius: '5px', }}>
+              <Box sx={{ fontWeight: 'bold' }}>{automation.id}.
+                {automation.action}</Box>
 
+              {automation.templates.label} <br />
+              <Typography sx={{ fontWeight: 'bold' }}>Conditions</Typography>
 
-                {automation.conditions.length > 0 && (
-                  <Box>
-                    <Typography sx={{ fontWeight: 'bold' }}>Conditions</Typography>
-                    {automation.conditions.map((tagId) => {
-                      const matchedTag = findTagById(tagId); // Match each tagId with its data
-                      if (matchedTag) {
-                        return (
-                          <span
-                            key={tagId}
-                            style={{
-                              backgroundColor: matchedTag.tagColour,
-                              borderRadius: '20px',
-                              color: '#fff',
-                              fontSize: '12px',
-                              fontWeight: '600',
-                              textAlign: 'center',
-                              padding: '3px',
-                              display: 'inline-block',
-                              width: `${calculateWidth(matchedTag.tagName)}px`,
-                              marginRight: '5px',
-                            }}
-                          >
-                            {matchedTag.tagName}
-                          </span>
-                        );
-                      }
-                      return null; // Return null instead of the message if matchedTag is not found
-                    })}
-                  </Box>
-                )}
+              {automation.conditions.map((condition) => (
+                <Box key={condition._id} >
+                  <span style={{
+                    backgroundColor: condition.tagColour, borderRadius: '20px',
+                    color: '#fff',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    textAlign: 'center',
+                    padding: '3px', display: 'inline-block',
+                   
 
-              </li>
-            </Paper>
-          ))}
-        </List>
-      </Box>
-    );
-  };
+                  }}>
 
-  const renderNewAutomationsForStage = (index) => {
-    const automationsForStage = automations[index] || []; // Get automations for the specific stage
-    return (
-      <Box>
+                    {condition.tagName}
+                  </span>
+                </Box>
+              ))}
 
-        <List>
-          {automationsForStage.map((automation) => (
-
-            <Paper elevation={3} sx={{ borderRadius: '10px' }}>
-              <li key={automation.id} style={{ textAlign: 'left', listStyle: 'none', padding: '15px', marginTop: 10, borderRadius: '5px', }}>
-                <Box sx={{ fontWeight: 'bold' }}>{automation.id}.
-                  {automation.action}</Box>
-
-                {automation.templates.label} <br />
-                <Typography sx={{ fontWeight: 'bold' }}>Conditions</Typography>
-
-                {automation.conditions.map((condition) => (
-                  <Box key={condition._id} >
-                    <span style={{
-                      backgroundColor: condition.tagColour, borderRadius: '20px',
-                      color: '#fff',
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      textAlign: 'center',
-                      padding: '3px', display: 'inline-block',
-                      width: `${calculateWidth(condition.tagName)}px`,
-
-                    }}>
-
-                      {condition.tagName}
-                    </span>
-                  </Box>
-                ))}
-
-              </li>
-            </Paper>
-          ))}
-        </List>
-      </Box>
-    );
-  };
-  // const renderAutomationsForStage = (stageIndex) => {
-  //   const stage = stages[stageIndex];
-  //   const findTagById = (tagId) => {
-
-  //     return tags.find((tag) => tag._id === tagId);
-  //   };
-  //   if (stage.automations && stage.automations.length > 0) {
-  //     return (
-  //       <Box>
-  //         {stage.automations.map((automation, idx) => (
-  //           <Box key={idx} sx={{ padding: '10px', border: '1px solid #B2BEB5', borderRadius: '5px', marginTop: '5px' }}>
-  //             <Typography variant="body2">{automation.action}</Typography>
-  //             {automation.templates && (
-  //               <Typography variant="body2">
-  //                 Template: {automation.templates.label}
-  //               </Typography>
-  //             )}
-  //             {automation.conditions.length > 0 && (
-  //               <Box>
-  //                 <Typography sx={{ fontWeight: 'bold' }}>Conditions</Typography>
-  //                 {automation.conditions.map((tagId) => {
-  //                   const matchedTag = findTagById(tagId); // Match each tagId with its data
-  //                   if (matchedTag) {
-  //                     return (
-  //                       <span
-  //                         key={tagId}
-  //                         style={{
-  //                           backgroundColor: matchedTag.tagColour,
-  //                           borderRadius: '20px',
-  //                           color: '#fff',
-  //                           fontSize: '12px',
-  //                           fontWeight: '600',
-  //                           textAlign: 'center',
-  //                           padding: '3px',
-  //                           display: 'inline-block',
-  //                           width: `${calculateWidth(matchedTag.tagName)}px`,
-  //                           marginRight: '5px',
-  //                         }}
-  //                       >
-  //                         {matchedTag.tagName}
-  //                       </span>
-  //                     );
-  //                   }
-  //                   return null; // Return null instead of the message if matchedTag is not found
-  //                 })}
-  //               </Box>
-  //             )}
-  //           </Box>
-  //         ))}
-  //       </Box>
-  //     );
-  //   }
-
-  //   return <Typography variant="body2">No automations set for this stage.</Typography>;
-  // };
+            </li>
+          </Paper>
+        ))}
+      </List>
+    </Box>
+  );
+};
 
   return (
     <Container>
@@ -998,14 +928,14 @@ setStages((prevStages) => {
                 <Grid xs={12} sm={5.8}>
                   <Box >
                     <InputLabel sx={{ color: 'black' }}>Pipeline Name</InputLabel>
-
+                    
                     <TextField
                       size="small"
                       margin="normal"
                       placeholder='Pipeline Name'
                       fullWidth
-                      value={piplineName}
-                      onChange={(e) => setPipeLineName(e.target.value)} />
+                     value={piplineName}
+                    onChange={(e) => setPipeLineName(e.target.value)}/>
                   </Box>
                   <Box mt={1}>
                     <InputLabel sx={{ color: 'black' }}>Available To</InputLabel>
@@ -1021,7 +951,7 @@ setStages((prevStages) => {
                         <Box
                           component="li"
                           {...props}
-                          sx={{ cursor: 'pointer', margin: '5px 10px' }}
+                          sx={{ cursor: 'pointer', margin: '5px 10px' }} 
                         >
                           {option.label}
                         </Box>
@@ -1037,15 +967,15 @@ setStages((prevStages) => {
 
                     <Autocomplete
                       className='select-dropdown'
-                      options={optionsort}
-                      value={selectedSortByJob}
-                      onChange={(event, newValue) => handleSortingByJobs(newValue)}
-                      getOptionLabel={(option) => option.label || ''}
+                      options={optionsort} 
+                      value={selectedSortByJob} 
+                      onChange={(event, newValue) => handleSortingByJobs(newValue)} 
+                      getOptionLabel={(option) => option.label || ''} 
                       renderOption={(props, option) => (
                         <Box
                           component="li"
                           {...props}
-                          sx={{ cursor: 'pointer', margin: '5px 10px' }}
+                          sx={{ cursor: 'pointer', margin: '5px 10px' }} 
                         >
                           {option.label}
                         </Box>
@@ -1060,27 +990,27 @@ setStages((prevStages) => {
                           InputLabelProps={{ shrink: true }}
                         />
                       )}
-                      isOptionEqualToValue={(option, value) => option.value === value.value}
-                      disableClearable={false}
-                      clearOnEscape
+                      isOptionEqualToValue={(option, value) => option.value === value.value} 
+                      disableClearable={false} 
+                      clearOnEscape 
                     />
                   </Box>
-
+             
 
                   <Box mt={2}>
                     <InputLabel sx={{ color: 'black' }}>Default job template</InputLabel>
 
                     <Autocomplete
                       className='select-dropdown'
-                      options={optiontemp}
-                      value={selectedtemp}
-                      onChange={handletemp}
-                      getOptionLabel={(option) => option.label || ''}
+                      options={optiontemp} 
+                      value={selectedtemp} 
+                      onChange={handletemp} 
+                      getOptionLabel={(option) => option.label || ''} 
                       renderOption={(props, option) => (
                         <Box
                           component="li"
                           {...props}
-                          sx={{ cursor: 'pointer', margin: '5px 10px' }}
+                          sx={{ cursor: 'pointer', margin: '5px 10px' }} 
                         >
                           {option.label}
                         </Box>
@@ -1095,9 +1025,9 @@ setStages((prevStages) => {
                           InputLabelProps={{ shrink: true }}
                         />
                       )}
-                      isOptionEqualToValue={(option, value) => option.value === value.value}
-                      disableClearable={false}
-                      clearOnEscape
+                      isOptionEqualToValue={(option, value) => option.value === value.value} 
+                      disableClearable={false} 
+                      clearOnEscape 
                     />
                   </Box>
 
@@ -1258,167 +1188,174 @@ setStages((prevStages) => {
                   marginBottom: '10%',
                   flexDirection: isSmallScreen ? 'column' : 'row'
                 }}>
+                  
                   {stages.map((stage, index) => (
-                    <Paper
-                      key={index}
-                      sx={{
-                        height: 'auto',
-                        marginTop: '20px',
-                        borderRadius: '10px',
-                        boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
-                        width: isSmallScreen ? '90%' : '20%',
-                        marginBottom: '20px',
-                        marginLeft: isSmallScreen ? '0' : '5px',
-                        alignSelf: isSmallScreen ? 'center' : 'flex-start'
-                      }}
-                    >
-                      <Box sx={{ margin: '10px' }}>
-                        <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                          <RxDragHandleDots2 />
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px', flexGrow: 1 }}>
-                            <LuPenLine />
-                            <TextField
-                              variant="outlined"
-                              placeholder="Stage Name"
-                              sx={{ flexGrow: 1 }}
-                              size='small'
-                              margin='normal'
-                              value={stage.name} onChange={(e) => handleStageNameChange(e, index)}
-                            />
-                          </Box>
-                          <IconButton onClick={() => handleDeleteStage(index)}>
-                            <RiDeleteBin6Line sx={{ color: 'red', cursor: 'pointer' }} />
-                          </IconButton>
-                        </Box>
-                        <Divider />
-                        <Box m={2}>
-                          <Typography variant="h6" sx={{ fontSize: '15px', fontWeight: 'bold' }}>Stage conditions</Typography>
-                          {index === 0 ? (
-                            <Typography variant="body2">First stage can't have conditions</Typography>
-                          ) : index === stages.length - 1 ? (
-                            <Typography variant="body2">Last stage can't have conditions</Typography>
-                          ) : (
-                            <Typography variant="body2">Job enters this stage if conditions are met</Typography>
-                          )}
-                          {index > 0 && index !== stages.length - 1 && (
-                            <Box sx={{ marginTop: '10px' }}>
-                              <Typography variant="body2" sx={{ cursor: 'pointer', color: 'blue', fontWeight: 'bold' }}>Add conditions</Typography>
-                            </Box>
-                          )}
-                          <Typography variant="h6" sx={{ fontSize: '15px', fontWeight: 'bold', mt: 2 }}>Automations</Typography>
-                          <Typography variant="body2">Triggered when job enters stage</Typography>
-                          <Typography variant="body2" sx={{ cursor: 'pointer', color: 'blue', fontWeight: 'bold', mt: 2 }} onClick={() => handleToggleAutoMoveDropdown(index)}>Added automation</Typography>
-                          <Box>
-
-
-                            
-                            {index === newStageIndex ? (
-                              renderNewAutomationsForStage(index) // Show new automations for the newly added stage
-                            ) : (
-                              renderAutomationsForStage(index) // Show existing automations for other stages
-                            )}
-                          </Box>
-                          <Typography variant="h6" sx={{ fontSize: '15px', mt: 2, fontWeight: 'bold' }}>Automove</Typography>
-                          <Typography variant="body2">Move jobs automatically when linked actions are completed</Typography>
-
-                          {showAutoMoveDropdown[index] && (
-                            <div className='automove-dropdown'>
-
-                              {automoveActions.map((action, idx) => (
-                                <li key={idx} onClick={() => handleActionSelect(action)}>{action}</li>
-                              ))}
-
-                            </div>
-                          )}
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
-                            <Switch
-                              onChange={() => handleAutoMoveChange(index)}
-                              checked={stage.autoMove}
-                              color="primary"
-                            />
-                            <Typography sx={{ cursor: "pointer" }}>Automove jobs</Typography>
-                          </Box>
-                        </Box>
-                      </Box>
-                      <Drawer
-                        anchor="right"
-                        open={isAutoFormOpen && !!activeAction}
-                        onClose={handleFormClose}
-                        PaperProps={{ sx: { width: 550 } }}
+                      <Paper
+                        key={index}
+                        sx={{
+                          height: 'auto',
+                          marginTop: '20px',
+                          borderRadius: '10px',
+                          boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
+                          width: isSmallScreen ? '90%' : '20%',
+                          marginBottom: '20px',
+                          marginLeft: isSmallScreen ? '0' : '5px',
+                          alignSelf: isSmallScreen ? 'center' : 'flex-start'
+                        }}
                       >
-                        <Box >
-
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2 }}>
-                            <Typography variant='h4'>Automations</Typography>
-                            <IconButton onClick={handleFormClose}>
-                              <RxCross2 />
+                        <Box sx={{ margin: '10px' }}>
+                          <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                            <RxDragHandleDots2 />
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px', flexGrow: 1 }}>
+                              <LuPenLine />
+                              <TextField
+                                variant="outlined"
+                                placeholder="Stage Name"
+                                sx={{ flexGrow: 1 }}
+                                size='small'
+                                margin='normal'
+                                value={stage.name} onChange={(e) => handleStageNameChange(e, index)}
+                              />
+                            </Box>
+                            <IconButton onClick={() => handleDeleteStage(index)}>
+                              <RiDeleteBin6Line sx={{ color: 'red', cursor: 'pointer' }} />
                             </IconButton>
                           </Box>
-                          <Box >
-                            <Box style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
-                              <Box style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                {items.map((item, index) => (
-                                  <Box key={item.id}>
-                                    <Box style={{ border: '1px solid #B2BEB5', borderRadius: '10px', padding: '10px' }}>
-                                      <Box style={{ display: 'flex', gap: '10px', fontSize: '20px', fontWeight: '550', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                          <RxDragHandleDots2 /> {item.id}. {item.action}
-                                        </Box>
+                          <Divider />
+                          <Box m={2}>
+                            <Typography variant="h6" sx={{ fontSize: '15px', fontWeight: 'bold' }}>Stage conditions</Typography>
+                            {index === 0 ? (
+                              <Typography variant="body2">First stage can't have conditions</Typography>
+                            ) : index === stages.length - 1 ? (
+                              <Typography variant="body2">Last stage can't have conditions</Typography>
+                            ) : (
+                              <Typography variant="body2">Job enters this stage if conditions are met</Typography>
+                            )}
+                            {index > 0 && index !== stages.length - 1 && (
+                              <Box sx={{ marginTop: '10px' }}>
+                                <Typography variant="body2" sx={{ cursor: 'pointer', color: 'blue', fontWeight: 'bold' }}  >Add conditions</Typography>
 
-                                        <IconButton onClick={() => handleDeleteItems(item.id)}>
-                                          <RiDeleteBin6Line />
-                                        </IconButton>
-                                      </Box>
-                                      {renderActionContent(item.action)}
-                                    </Box>
-                                  </Box>
+
+                              </Box>
+                            )}
+
+                            <Typography variant="h6" sx={{ fontSize: '15px', fontWeight: 'bold', mt: 2 }}>Automations</Typography>
+                            <Typography variant="body2">Triggered when job enters stage</Typography>
+                            <Typography variant="body2" sx={{ cursor: 'pointer', color: 'blue', fontWeight: 'bold', mt: 2 }} onClick={() => handleToggleAutoMoveDropdown(index)}>Added automation</Typography>
+
+                            <Box>
+
+
+                            {
+                              renderAutomationsForStage(index) // Show existing automations for other stages
+                            }
+
+                            </Box>
+
+                            <Typography variant="h6" sx={{ fontSize: '15px', mt: 2, fontWeight: 'bold' }}>Automove</Typography>
+                            <Typography variant="body2">Move jobs automatically when linked actions are completed</Typography>
+
+
+
+                            {showAutoMoveDropdown[index] && (
+                              <div className='automove-dropdown'>
+
+                                {automoveActions.map((action, idx) => (
+                                  <li key={idx} onClick={() => handleActionSelect(action)}>{action}</li>
                                 ))}
-                              </Box>
-                              <Box>
-                                <Box
-                                  style={{
-                                    display: 'flex',
-                                    gap: '10px',
-                                    alignItems: 'center',
-                                    cursor: 'pointer',
-                                    margin: '15px 0',
-                                  }}
-                                >
-                                  <LuPlusCircle style={{ color: 'blue' }} />
-                                  <li
-                                    style={{
-                                      listStyle: 'none',
-                                      cursor: 'pointer',
-                                      color: 'blue',
-                                      fontWeight: 'bold',
-                                    }}
-                                    onClick={() => setShowAutoMovesDropdown(!showAutoMovesDropdown)}
-                                  >
-                                    add automove
-                                  </li>
 
-                                </Box>
-                                {showAutoMovesDropdown && (
-                                  <Box className='automove-dropdown2'>
-                                    <List>
-                                      {automoveActionsForm.map((action, index) => (
-                                        <li key={index} onClick={() => handleAddItems(action)}>
-                                          {action}
-                                        </li>
-                                      ))}
-                                    </List>
-                                  </Box>
-                                )}
-                              </Box>
-                              <Box><Button onClick={() => handleSaveAutomations(index)} variant="contained" color="primary" sx={{ marginTop: '15px' }}>
-                                Save
-                              </Button></Box>
+                              </div>
+                            )}
+
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
+                              <Switch
+                                onChange={() => handleAutoMoveChange(index)}
+                                checked={stage.autoMove}
+                                color="primary"
+                              />
+                              <Typography sx={{ cursor: "pointer" }}>Automove jobs</Typography>
                             </Box>
                           </Box>
                         </Box>
-                      </Drawer>
-                    </Paper>
-                  ))}
+                        <Drawer
+                          anchor="right"
+                          open={isAutoFormOpen && !!activeAction}
+                          onClose={handleFormClose}
+                          PaperProps={{ sx: { width: 550 } }}
+                        >
+                          <Box >
+
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2 }}>
+                              <Typography variant='h4'>Automations</Typography>
+                              <IconButton onClick={handleFormClose}>
+                                <RxCross2 />
+                              </IconButton>
+                            </Box>
+                            <Box >
+                              <Box style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
+                                <Box style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                  {items.map((item, index) => (
+                                    <Box key={item.id}>
+                                      <Box style={{ border: '1px solid #B2BEB5', borderRadius: '10px', padding: '10px' }}>
+                                        <Box style={{ display: 'flex', gap: '10px', fontSize: '20px', fontWeight: '550', justifyContent: 'space-between', alignItems: 'center' }}>
+                                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                            <RxDragHandleDots2 /> {item.id}. {item.action}
+                                          </Box>
+
+                                          <IconButton onClick={() => handleDeleteItems(item.id)}>
+                                            <RiDeleteBin6Line />
+                                          </IconButton>
+                                        </Box>
+                                        {renderActionContent(item.action)}
+                                      </Box>
+                                    </Box>
+                                  ))}
+                                </Box>
+                                <Box>
+                                  <Box
+                                    style={{
+                                      display: 'flex',
+                                      gap: '10px',
+                                      alignItems: 'center',
+                                      cursor: 'pointer',
+                                      margin: '15px 0',
+                                    }}
+                                  >
+                                    <LuPlusCircle style={{ color: 'blue' }} />
+                                    <li
+                                      style={{
+                                        listStyle: 'none',
+                                        cursor: 'pointer',
+                                        color: 'blue',
+                                        fontWeight: 'bold',
+                                      }}
+                                      onClick={() => setShowAutoMovesDropdown(!showAutoMovesDropdown)}
+                                    >
+                                      add automove
+                                    </li>
+
+                                  </Box>
+                                  {showAutoMovesDropdown && (
+                                    <Box className='automove-dropdown2'>
+                                      <List>
+                                        {automoveActionsForm.map((action, index) => (
+                                          <li key={index} onClick={() => handleAddItems(action)}>
+                                            {action}
+                                          </li>
+                                        ))}
+                                      </List>
+                                    </Box>
+                                  )}
+                                </Box>
+                                <Box><Button onClick={() => handleSaveAutomations(index)} variant="contained" color="primary" sx={{ marginTop: '15px' }}>
+                                  Save
+                                </Button></Box>
+                              </Box>
+                            </Box>
+                          </Box>
+                        </Drawer>
+                      </Paper>
+                    ))}
                   <Box mt={3}>
                     <Button
                       variant="contained"
@@ -1435,7 +1372,7 @@ setStages((prevStages) => {
               </Box>
 
               <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-                <Button onClick={handleButtonClick} variant="contained" color="primary">Save & exit</Button>
+              <Button onClick={handleButtonClick} variant="contained" color="primary">Save & exit</Button>
                 <Button onClick={updateSavePipe} variant="contained" color="primary">Save</Button>
                 <Button variant="outlined" onClick={hanleCloseupdate} >Cancel</Button>
               </Box>
@@ -1449,3 +1386,13 @@ setStages((prevStages) => {
 };
 
 export default PipelineTempUpdate;
+
+
+
+
+
+// {index === newStageIndex ? (
+//   renderNewAutomationsForStage(index) // Show new automations for the newly added stage
+// ) : (
+//   renderAutomationsForStage(index) // Show existing automations for other stages
+// )}

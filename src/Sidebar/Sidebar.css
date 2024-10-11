@@ -206,7 +206,14 @@ gap: 5px;
 /* .collapsed .logout-link{
   flex-direction: column;
 } */
-
+.menu-list-name{
+  /* border:1px solid red; */
+  height : 73vh;
+  overflow-y: auto;
+}
+.menu-list-name::-webkit-scrollbar{
+  display: none;
+}
 @media (max-width: 768px) {
   .sidebar {
     display: none;

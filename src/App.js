@@ -81,6 +81,8 @@ const App = () => {
        
         <Route path="/forgotpass" element={<ForgotPassword />} />
         <Route path="/resetpassword/:id/:token" element={<ResetPassword />} />
+
+
         <Route path='/' element={<SidebarComponent />}>
           <Route index element={<Insights />} />
           <Route path='/docs' element={<Docs />} />
@@ -153,10 +155,10 @@ const App = () => {
               <Route path="archivedjobs" element={<ArchivedJobs />} />
             </Route>
           </Route>
-          <Route path='*' element={<ErrorPage />} />
+          
 
         </Route>
-
+        <Route path='*' element={<ErrorPage />} />
 
       </Routes>
     </BrowserRouter>
@@ -165,11 +167,3 @@ const App = () => {
 
 export default App;
 
-
-
-
-
- {/* <Route path='/signup' element={<Adminsignup />} /> */}
-  {/* <Route path='/newlogin' element={<AdminLogin/>}/> */}
-  // import Adminsignup from './Admin-login-signup/adminSignup.js'
-// import AdminLogin from './Admin-login-signup/adminLogin.js'
