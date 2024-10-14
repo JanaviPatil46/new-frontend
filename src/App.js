@@ -69,6 +69,7 @@ import  ForgotPassword from './Admin-login-signup/Forgotpassword.js';
 import  ResetPassword from './Admin-login-signup/ResetPassword.js';
 import Adminsignup from './Admin-login-signup/newsignup.js'
 import AdminLogin from './Admin-login-signup/Login';
+import ClientFacing from './Templates/ClientFacing/clientfacing.js'
 const App = () => {
   return (
 
@@ -102,6 +103,7 @@ const App = () => {
             <Route path='tags' element={<Tags />} />
             <Route path='emails' element={<EmailTemp />} />
             <Route path='emails/emailTempUpdate/:_id' element={<EmailTempUpdate />} />
+            <Route path='clientfacing' element={<ClientFacing/>}/>
             <Route path='jobs' element={<JobTemp />} />
             <Route path="jobs/JobTemplateUpdate/:_id" element={<JobTemplateUpdate />} />
             <Route path='pipelines' element={<PipelineTemp />} />

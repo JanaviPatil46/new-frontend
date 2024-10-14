@@ -8,7 +8,7 @@ import {
   Alert,
   Autocomplete,
   TextField,
-
+  InputLabel,InputAdornment,
   Switch, FormControlLabel,
   List,
   ListItem,
@@ -30,13 +30,26 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { CiMenuKebab } from "react-icons/ci";
-import EditCalendarRoundedIcon from '@mui/icons-material/EditCalendarRounded';
+
 dayjs.extend(customParseFormat);
 
-const JobTemp = () => {
+const JobTemp = ({ charLimit = 4000 }) => {
   const JOBS_API = process.env.REACT_APP_JOBS_TEMP_URL;
   const USER_API = process.env.REACT_APP_USER_URL;
-
+  const [inputText, setInputText] = useState('');
+  const [charCount, setCharCount] = useState(0);
+  const [clientDescription, setClientDescription] = useState('');
+  const handlechatsubject = (e) => {
+    const { value } = e.target;
+    setInputText(value);
+  };
+  const handleChange = (event) => {
+    const value = event.target.value;
+    if (value.length <= charLimit) {
+      setClientDescription(value);
+        setCharCount(value.length);
+    }
+};
   const navigate = useNavigate();
   const [templatename, settemplatename] = useState("");
   const [priority, setPriority] = useState('');
@@ -47,17 +60,24 @@ const JobTemp = () => {
   const [startDate, setStartDate] = useState(null);
   const [dueDate, setDueDate] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorElClientJob, setAnchorElClientJob] = useState(null);
+  // const [anchorEl, setAnchorEl] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showDropdownClientJob, setShowDropdownClientJob] = useState(false);
   const [jobName, setJobName] = useState('');
   const [shortcuts, setShortcuts] = useState([]);
   const [filteredShortcuts, setFilteredShortcuts] = useState([]);
   const [selectedOption, setSelectedOption] = useState('contacts');
   const [selectedShortcut, setSelectedShortcut] = useState("");
+  const [selectedJobShortcut, setSelectedJobShortcut] = useState("");
   const [startsInDuration, setStartsInDuration] = useState("Days");
   const [dueinduration, setdueinduration] = useState("Days");
   // const [startsinduration, setstartsinduration] = useState("");
   const [description, setDescription] = useState('');
-
+  const [clientFacingStatus, setClientFacingStatus] = useState(false);
+  const handleClientFacing = (checked) => {
+    setClientFacingStatus(checked);
+  };
   const handleEditorChange = (content) => {
     setDescription(content);
   };
@@ -66,11 +86,22 @@ const JobTemp = () => {
     setAnchorEl(event.currentTarget);
     setShowDropdown(!showDropdown);
   };
-
+  const toggleShortcodeDropdown = (event) =>{
+    setAnchorElClientJob(event.currentTarget);
+    setShowDropdownClientJob(!showDropdownClientJob);
+  }
+const toggleDescriptionDropdown = (event) =>{
+  setAnchorEl(event.currentTarget);
+  setShowDropdown(!showDropdown);
+}
   const handleAddShortcut = (shortcut) => {
     setJobName((prevText) => prevText + `[${shortcut}]`);
     setShowDropdown(false);
   };
+  const handleJobAddShortcut = (shortcut)=>{
+    setInputText((prevText) => prevText + `[${shortcut}]`);
+    setShowDropdownClientJob(false);
+  }
   const handleCreateJobTemplate = () => {
     setShowForm(true); // Show the form when button is clicked
   };
@@ -223,6 +254,8 @@ const JobTemp = () => {
   const handleCloseDropdown = () => {
     setShowDropdown(false);
     setAnchorEl(null);
+    setAnchorElClientJob(false);
+    setAnchorElClientJob(null)
   };
   const handlejobName = (e) => {
     const { value } = e.target;
@@ -596,7 +629,7 @@ const JobTemp = () => {
   });
   const [errors, setErrors] = useState({});
 
- 
+
   const validateForm = () => {
     let tempErrors = {};
     let isValid = true;
@@ -650,7 +683,7 @@ const JobTemp = () => {
 
             <Box ><hr /></Box>
             <Grid container spacing={2} >
-              <Grid xs={12} sm={5.8} >
+              <Grid xs={12} sm={5.8}>
                 <Box mt={2}>
                   <label className='jobtemp-input-label'>Template Name</label>
                   <TextField
@@ -917,15 +950,159 @@ const JobTemp = () => {
                   }}
                 ></Box>
               </Grid>
+
+
               <Grid xs={12} sm={5.8} >
                 <Box
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}
+                  style={{ display: 'flex', alignItems: 'center', }}
                 >
-                  {/* <EditCalendarRoundedIcon sx={{ fontSize: '120px', color: '#c6c7c7', }} /> */}
-                  <Box style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                   
+
+                  <Box style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <Typography variant='body'><b>Client-facing status</b>
+                      </Typography>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            onChange={(event) => handleClientFacing(event.target.checked)}
+                            checked={clientFacingStatus}
+                            color="primary"
+                          />
+                        }
+                        label="Show in Client portal"
+                      />
+                    </Box>
+                    <Box>
+                      {clientFacingStatus && (
+                        <>
+                          <Typography>Job name for client</Typography>
+                          <TextField
+                            fullWidth
+                            name="subject"
+                            value={inputText + selectedJobShortcut} onChange={handlechatsubject}
+                            placeholder="Job name for client"
+                            size="small"
+
+
+                            sx={{ background: '#fff', mt: 2 }}
+                          />
+
+                          <Box>
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              onClick={toggleShortcodeDropdown}
+                              sx={{ mt: 2 }}
+                            >
+                              Add Shortcode
+                            </Button>
+                            <Popover
+                              open={showDropdownClientJob}
+                              anchorEl={anchorElClientJob}
+                              onClose={handleCloseDropdown}
+                              anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'left',
+                              }}
+                              transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'left',
+                              }}
+                            >
+                              <Box >
+                                <List className="dropdown-list" sx={{ width: '300px', height: '300px', cursor: 'pointer' }}>
+                                  {filteredShortcuts.map((shortcut, index) => (
+                                    <ListItem
+                                      key={index}
+                                      onClick={() => handleJobAddShortcut(shortcut.value)}
+                                    >
+                                      <ListItemText
+                                        primary={shortcut.title}
+                                        primaryTypographyProps={{
+                                          style: {
+                                            fontWeight: shortcut.isBold ? 'bold' : 'normal',
+                                          },
+                                        }}
+                                      />
+                                    </ListItem>
+                                  ))}
+                                </List>
+                              </Box>
+                            </Popover>
+                          </Box>
+                          <Box sx={{ position: 'relative', mt: 2 }}>
+                            <InputLabel sx={{ color: 'black' }}>Description</InputLabel>
+                            <TextField
+                                fullWidth
+                                size='small'
+                                margin='normal'
+                                type="text"
+                                value={clientDescription}
+                                onChange={handleChange}
+                                placeholder="Description"
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <Typography sx={{ color: 'gray', fontSize: '12px', position: 'absolute', bottom: '15px', right: '15px' }}>
+                                                {charCount}/{charLimit}
+                                            </Typography>
+                                        </InputAdornment>
+                                    ),
+                                }}
+
+                            />
+                        </Box>
+                        <Box>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={toggleDescriptionDropdown}
+                                sx={{ mt: 2, }}
+                            >
+                                Add Shortcode
+                            </Button>
+
+                            <Popover
+                                open={showDropdown}
+                                anchorEl={anchorEl}
+                                onClose={handleCloseDropdown}
+                                anchorOrigin={{
+                                    vertical: 'bottom',
+                                    horizontal: 'left',
+                                }}
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'left',
+                                }}
+                            >
+                                <Box >
+                                    <List className="dropdown-list" sx={{ width: '300px', height: '300px', cursor: 'pointer' }}>
+                                        {filteredShortcuts.map((shortcut, index) => (
+                                            <ListItem
+                                                key={index}
+                                                onClick={() => handleAddShortcut(shortcut.value)}
+                                            >
+                                                <ListItemText
+                                                    primary={shortcut.title}
+                                                    primaryTypographyProps={{
+                                                        style: {
+                                                            fontWeight: shortcut.isBold ? 'bold' : 'normal',
+                                                        },
+                                                    }}
+                                                />
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                </Box>
+                            </Popover>
+                        </Box>
+                          
+                        </>
+                      )}
+                    </Box>
                     {comments.map((comment, index) => (
-                      <div key={index} style={{ display: 'flex',alignItems: 'center', gap: '8px' }}>
+                      <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <TextField
                           value={comment}
                           onChange={(e) => handleCommentChange(index, e.target.value)}
@@ -942,8 +1119,6 @@ const JobTemp = () => {
                   </Box>
                 </Box>
               </Grid>
-
-
             </Grid>
             <Box mt={3}><hr /></Box>
 

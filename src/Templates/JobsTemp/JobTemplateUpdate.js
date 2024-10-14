@@ -727,12 +727,12 @@ const JobTemplateUpdate = () => {
             </Grid>
 
            
-            <Grid xs={12} sm={5.8} mt={3}>
+            <Grid xs={12} sm={5.8} mt={3} ml={2}>
               <Box
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}
+                style={{ display: 'flex', alignItems: 'center',  }}
               >
                 {/* <EditCalendarRoundedIcon sx={{ fontSize: '120px', color: '#c6c7c7', }} /> */}
-                <Box style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <Box style={{ display: 'flex', flexDirection: 'column', gap: '8px',width:'100%' }}>
 
                   {comments.map((comment, index) => (
                     <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

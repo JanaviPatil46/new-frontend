@@ -34,6 +34,7 @@ const Templates = () => {
                     <NavLink to='/firmtemp/templates/tags'>Tag</NavLink>
                     <NavLink to='/firmtemp/templates/emails'>Emails</NavLink>
                     <NavLink to='/firmtemp/templates/jobs'>Jobs</NavLink>
+                    <NavLink to='/firmtemp/templates/clientfacing'>Clients Facing Jobs</NavLink>
                     <NavLink to='/firmtemp/templates/pipelines'>Pipelines</NavLink>
 
                     <NavLink to='/firmtemp/templates/folders'>Folders</NavLink>
